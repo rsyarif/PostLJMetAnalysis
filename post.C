@@ -46,6 +46,12 @@ TH1F* extrackBkg(TH2F* bkg_hist);
 TH1F* make_ratio_uncertainty_hist(TH1F* data, TH1F* bkg);
 void fix_negatives(TH1F* hist);
 void fix_negativesX(TH2F* hist);
+string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg, string dir, 
+								std::vector<string> SigtoInclude, int SignalInflationFactor,
+								string dataClassName, 
+								std::vector<DMCclass*> vBkgClasses, 
+								std::vector<DMCclass*> vBkgClassesUP, 
+								std::vector<DMCclass*> vBkgClassesDOWN );
 string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg,    string dir, 
 	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN );
 std::vector<thetaSigFile*> MakeThetaRootFile_Yield_signalScan(stringmap<std::vector<TH1F*>> Signal_yields,  std::vector<DMCclass*> vSigClassesAll,string dir, int nBRslices);
@@ -1230,7 +1236,7 @@ void post(){
 	// added by rizki - make S/sqrt{S+B} plot intead of ratio - end
 	
 	//added by rizki - output for Theta - start
-	if(produceThetaOut)MakeThetaRootFile_Yield_nonsignal(htable,histmapbkg,"forTheta",dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN );
+	if(produceThetaOut)MakeThetaRootFile_Yield(htable,histmapbkg,"forTheta", SigtoInclude, SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN );
 	//added by rizki - output for Theta - end
 
 	//close all the files you opened. 
@@ -1305,11 +1311,11 @@ string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg
 		//histmapbkg is indexed using the h_ name rather than the b_name
 		//This is done around the line "histmapbkg->set(thisbkgplotname,temp2);"
 	TH1F* ddbks[nmodes];
-	ddbks[0] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG");
-	ddbks[1] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__passrate__plus");
-	ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__passrate__minus");
-	ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__failrate__plus");
-	ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__failrate__minus");
+	ddbks[0] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG").c_str());
+	ddbks[1] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__plus").c_str());
+	ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
+	ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
+	ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
 	for(int i=0;i<nmodes;i++) ddbks[i]->Write();
 		
 	}//end try
@@ -1327,13 +1333,13 @@ string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg
 } //end MakeThetaRootFile_Yield
 
 //added by rizki - start
-string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    string dir, std::vector<string> SigToInclude
+string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    string dir, std::vector<string> SigtoInclude, int SignalInflationFactor,
 	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN ){
 	//takes in a heap of histograms and produces a root file with all those histograms. 
 	//
 	//This takes in Data, all backgrounds, and all their variations, and writes them to a file.
 	
-	string varname = "yield";
+	string varname = "yieldNULL";
 	string plotname = "h_"+varname; 
 
 	string filename = dir+"/hist4limit_yield.root";
@@ -1343,46 +1349,46 @@ string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    strin
 	f->cd();
 
 	try{
+		//get signal
+		for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
+			TH1F* sighist = (TH1F*)htable.get_throwable(*imc,1)->get_throwable(plotname,2)->Clone((plotname+"_"+(*imc)+"__sig").c_str());
+			sighist->Scale(1/SignalInflationFactor); //undo signalInflationFactor. IS THIS CORRECT??
+			sighist->Write();
+		}
 
-	//get signal
-	for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
-		TH1F* sighist = htable.get_throwable(*imc,1)->get_throwable(plotname,2)->Clone((plotname+"__sig").c_str());
-		sighist->Write();
-	}
+		//fetch data. 
+		TH1F* datahist = (TH1F*) htable.get_throwable(dataClassName,1)->get_throwable(plotname,2)->Clone((plotname+"__DATA").c_str());
+		datahist->Write(); 
 
-	//fetch data. 
-	TH1F* datahist = (TH1F*) htable.get_throwable(dataClassName,1)->get_throwable(plotname,2)->Clone((plotname+"__DATA").c_str());
-	datahist->Write(); 
+		//write all the background histograms. 
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass<vBkgClasses.end();iclass++){ //for every bkg class
+			TH1F* thisbkghist = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
+			thisbkghist->Write();
+		}
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass<vBkgClassesUP.end();iclass++){ //for every bkg class
+				//PSES = Parton Shower Eneryg Scale up
+			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
+			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__plus").c_str());
+			thisbkghistclone->Write();
+		}
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass<vBkgClassesDOWN.end();iclass++){ //for every bkg class
+				//PSES = Parton Shower Eneryg Scale down
+			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
+			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__minus").c_str());
+			thisbkghistclone->Write();
+		}
 
-	//write all the background histograms. 
-	for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass<vBkgClasses.end();iclass++){ //for every bkg class
-	    TH1F* thisbkghist = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
-	    thisbkghist->Write();
-	}
-	for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass<vBkgClassesUP.end();iclass++){ //for every bkg class
-			//PSES = Parton Shower Eneryg Scale up
-	    TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
-	    TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__plus").c_str());
-	    thisbkghistclone->Write();
-	}
-	for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass<vBkgClassesDOWN.end();iclass++){ //for every bkg class
-			//PSES = Parton Shower Eneryg Scale down
-	    TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
-	    TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__minus").c_str());
-	    thisbkghistclone->Write();
-	}
-
-	//Get the ddhists
-	TH2F* ddbkgs = histmapbkg->get_throwable(plotname,3); 
+		//Get the ddhists
+		TH2F* ddbkgs = histmapbkg->get_throwable(plotname,3); 
 		//histmapbkg is indexed using the h_ name rather than the b_name
 		//This is done around the line "histmapbkg->set(thisbkgplotname,temp2);"
-	TH1F* ddbks[nmodes];
-	ddbks[0] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG");
-	ddbks[1] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__passrate__plus");
-	ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__passrate__minus");
-	ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__failrate__plus");
-	ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone("h_yield__DDBKG__failrate__minus");
-	for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+		TH1F* ddbks[nmodes];
+		ddbks[0] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG").c_str());
+		ddbks[1] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__plus").c_str());
+		ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
+		ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
+		ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
+		for(int i=0;i<nmodes;i++) ddbks[i]->Write();
 		
 	}//end try
 	catch(std::pair <std::string,int> errorpair){
