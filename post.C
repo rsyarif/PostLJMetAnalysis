@@ -101,7 +101,8 @@ void post(){
 	plotdirs.set("eps", plotsdireps );
 
 
-	SigtoInclude.push_back(string("TpTp800")+(T50ns_F25ns?"s":"f"));
+	SigtoInclude.push_back(string("TpTp700")+(T50ns_F25ns?"s":"f"));
+// 	SigtoInclude.push_back(string("TpTp800")+(T50ns_F25ns?"s":"f"));
 	SigtoInclude.push_back(string("TpTp1200")+(T50ns_F25ns?"s":"f"));
 	string dataClassName = string("Data2lep")+(T50ns_F25ns?"s":"f");
 
