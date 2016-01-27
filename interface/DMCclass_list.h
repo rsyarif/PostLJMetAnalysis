@@ -142,11 +142,9 @@ std::vector<DMCclass*> setupDMCclasses(){
 	    DMCclasses.push_back(temp); }*/
 
 
-        namedInt ttj_int_meta= {{"FillColor",kViolet-5},{"LineColor",kViolet-5},{"isData",0},{"isSignal",0}};
-        namedString ttj_string_meta= {{"LegendLabel","t#bar{t}"}};
-	{ DMCclass* temp = new DMCclass("ttjf",vb[mb["ttjf"]],ttj_int_meta, null_float_meta, ttj_string_meta,false); //NEW
-	    temp->add(vb[mb["ttj_highstatsf"]]); //that'll slow  things down. //NEW
-	    DMCclasses.push_back(temp); }
+	namedInt ttj_int_meta= {{"FillColor",kViolet-5},{"LineColor",kViolet-5},{"isData",0},{"isSignal",0}};
+	namedString ttj_string_meta= {{"LegendLabel","t#bar{t}"}};
+	DMCclasses.push_back(new DMCclass("ttjf",vb[mb["ttj_highstatsf"]],ttj_int_meta, null_float_meta, ttj_string_meta,false);
 	DMCclasses.push_back(new DMCclass("ttjDOWNf",vb[mb["ttjDOWNf"]],ttj_int_meta, null_float_meta, ttj_string_meta,false));
 	DMCclasses.push_back(new DMCclass("ttjUPf",vb[mb["ttjUPf"]],ttj_int_meta, null_float_meta, ttj_string_meta,false));
 
