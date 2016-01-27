@@ -52,7 +52,7 @@ string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg, string d
 								string dataClassName, 
 								std::vector<DMCclass*> vBkgClasses, 
 								std::vector<DMCclass*> vBkgClassesUP, 
-								std::vector<DMCclass*> vBkgClassesDOWN 
+								std::vector<DMCclass*> vBkgClassesDOWN, 
 								bool draw_ddbkg);
 string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg,    string dir, 
 	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN, bool draw_ddbkg );
@@ -87,7 +87,7 @@ void post(){
 	bool makeStackPlots_log = false;
 	bool makeStackPlots_log_ratio = false;
 	
-	bool makeStackPlots_log_SBsignif = false ; //added by rizki
+	bool makeStackPlots_log_SBsignif = true ; //added by rizki
 	bool produceThetaOut = true;
 
 	///////////////////////////// Lists  //////////////////////////////////////
