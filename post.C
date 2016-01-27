@@ -1180,7 +1180,7 @@ void post(){
 		    pad_ratio->cd();			
 			pad_ratio->SetGridy();
 			TH1F* sighist = (TH1F*) htable.get_throwable(SigtoInclude[0],5)->get_throwable(*iplot,6)->Clone("sighist");
-			sighist->Scale(1/SignalInflationFactor); //undo SignalInflationFactor
+			sighist->Scale(1./SignalInflationFactor); //undo SignalInflationFactor
 			TH1F* sig_plus_MCBkg_hist = (TH1F*) sighist->Clone("sig_plus_MCBkg_hist");;
 			sig_plus_MCBkg_hist->Add(MCbackground);			
 		    TH1F* ratio = DivideHists(sighist,sig_plus_MCBkg_hist,1);	//mode=1: num/sqrt(denom)
@@ -1352,7 +1352,7 @@ string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    strin
 		//get signal
 		for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
 			TH1F* sighist = (TH1F*)htable.get_throwable(*imc,1)->get_throwable(plotname,2)->Clone((plotname+"_"+(*imc)+"__sig").c_str());
-			sighist->Scale(1/SignalInflationFactor); //undo signalInflationFactor. IS THIS CORRECT??
+			sighist->Scale(1./SignalInflationFactor); //undo signalInflationFactor. need scale to 1 pb??
 			sighist->Write();
 		}
 
