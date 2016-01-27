@@ -151,6 +151,16 @@ bool IsKinvar(string kinvar){
 
 	const int nmodes = 5;
 	static const int nBByields = 6;
+	static const int nSysYields = 1+//nominal
+					2+//PU corrections
+					2+//renorm envelope
+					2;//pdf 1 sigmas. 
+	static const int nRenorm = 6;
+	static const int nPDF = 100;
+	static const int nPolySysYields = 1+//nominal
+					2+//PU corrections
+					nRenorm+//renorm envelope
+					nPDF;//pdf 1 sigmas. 
 	//mode 0 = nominal. 1 = fakerate plus, 2 = fakerate minus, 3 = passrate plus, 4 = passrate minus 5=qg fake plus, 6=qg fake minus.
 	//see feModeBehavior in fakerate.h
 

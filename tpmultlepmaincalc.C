@@ -116,6 +116,17 @@ void FillBkg(TH2F* h, float x, double bkgweights[], double auxWeight);
 float MCbrReweight( bool isBWBW, bool isTHBW, bool isTHTH, bool isTZBW, bool isTZTH, bool isTZTZ,
 	    float bWbr, float tHbr, float tZbr);
 
+void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vector<double>  *LHEWeights_singleLepCalc, 
+	std::vector<double>* renorm, std::vector<double>* pdf  );
+struct val_err_pair{float val; float err;};
+bool VEpairCompare(val_err_pair* firstElem, val_err_pair* secondElem);
+void Convert_nPolySysYields_to_nSysYields(TH2F* s_yield,TH2F* ps_yield);
+void FillPSYields(TH2F* ps_yield,float yield,float weight_before_PU,   double puweight_nominal,double puweight_up,double puweight_down, std::vector<double>* renorm, std::vector<double>* pdf );
+
+static const double puweight260627_72ub[60] = {1.048445e+02, 1.417593e+02, 8.807366e+01, 3.236995e+01, 1.683957e+01, 2.831305e+00, 1.423759e+00, 1.612828e+00, 2.306693e+00, 2.473619e+00, 2.514170e+00, 2.546666e+00, 2.333108e+00, 1.836848e+00, 1.221869e+00, 6.836922e-01, 3.275329e-01, 1.432766e-01, 6.667120e-02, 3.763312e-02, 2.341225e-02, 1.359301e-02, 6.804618e-03, 2.922054e-03, 1.130104e-03, 4.448707e-04, 2.080687e-04, 1.239100e-04, 8.786009e-05, 6.837745e-05, 5.143024e-05, 3.476586e-05, 1.906542e-05, 9.115409e-06, 3.556074e-06, 1.447242e-06, 5.171527e-07, 1.940254e-07, 6.513423e-08, 2.309190e-08, 7.790329e-09, 2.199365e-09, 6.795396e-10, 1.624286e-10, 4.931596e-11, 1.298753e-11, 7.930341e-12, 2.315454e-12, 1.497868e-11, 2.172998e-12, 9.012326e-14, 1.094585e-14, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00};
+static const double puweight260627_69ub[60] = {1.245238e+02, 1.562054e+02, 9.528614e+01, 3.645428e+01, 2.049345e+01, 3.843197e+00, 2.215886e+00, 2.747772e+00, 3.412640e+00, 3.156122e+00, 2.921218e+00, 2.709273e+00, 2.214740e+00, 1.509242e+00, 8.529270e-01, 4.047681e-01, 1.706805e-01, 7.408239e-02, 3.853898e-02, 2.208110e-02, 1.157933e-02, 5.111779e-03, 1.897273e-03, 6.326908e-04, 2.194698e-04, 9.396686e-05, 5.134064e-05, 3.356329e-05, 2.432826e-05, 1.843384e-05, 1.299881e-05, 8.002472e-06, 3.916437e-06, 1.648432e-06, 5.607770e-07, 1.975807e-07, 6.075239e-08, 1.950465e-08, 5.573450e-09, 1.673234e-09, 4.755563e-10, 1.125301e-10, 2.899281e-11, 5.749377e-12, 1.440875e-12, 3.115802e-13, 1.554955e-13, 3.630806e-14, 2.427227e-13, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00};
+static const double puweight260627_65ub[60] = {1.458817e+02, 1.724645e+02, 1.043786e+02, 4.182011e+01, 2.579572e+01, 5.495080e+00, 3.731141e+00, 4.618505e+00, 4.765473e+00, 3.872168e+00, 3.259346e+00, 2.705177e+00, 1.908453e+00, 1.092269e+00, 5.137612e-01, 2.085454e-01, 8.454498e-02, 4.109705e-02, 2.206794e-02, 1.053976e-02, 4.084606e-03, 1.298473e-03, 3.698050e-04, 1.135070e-04, 4.460047e-05, 2.240654e-05, 1.319444e-05, 8.644198e-06, 5.969210e-06, 4.142850e-06, 2.600931e-06, 1.398830e-06, 5.905424e-07, 2.124612e-07, 6.132579e-08, 1.821361e-08, 4.691640e-09, 1.254258e-09, 2.966644e-10, 7.328361e-11, 1.703655e-11, 3.277952e-12, 6.826269e-13, 1.087907e-13, 2.182661e-14, 3.753385e-15, 1.408114e-15, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00};
+
 //      __                    
 //     / /   ____  ____  ____ 
 //    / /   / __ \/ __ \/ __ \
@@ -271,19 +282,29 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
     ///////////////////Initalize Specials//////////////////////
 //Eg.     TH1F* h_MinMlb_OSDL1sanslb;	TH2F* b_MinMlb_OSDL1sanslb;
    
-    TH1F* h_yield = new TH1F( "h_yield", "Yields in Various Channels;Channel", 5,0,5);
-    TH2F* b_yield = new TH2F( "b_yield", "Yields in Various Channels;Channel", 5,0,5,nmodes,0,nmodes);
+    TH1F* h_yield = new TH1F( "h_yield", "Yields in Various Channels;Channel", 4,0,4);
+    TH2F* s_yield = new TH2F( "s_yield", "Yields in Various Channels;Channel", 4,0,4,nSysYields,0,nSysYields); //systematics, what gets saved.
+    TH2F* ps_yield= new TH2F("ps_yield","Yields in Various Channels;Channel", 4,0,4,nPolySysYields,0,nPolySysYields); //poly systematics, internal only.
+    TH2F* b_yield = new TH2F( "b_yield", "Yields in Various Channels;Channel", 4,0,4,nmodes,0,nmodes);
 
 
     TH1F* h_yield_BB[nBByields];
+    TH2F* s_yield_BB[nBByields];
+    TH2F* ps_yield_BB[nBByields];
         //0:WW, 1:WH, 2: WZ, 3: HH, 4: HZ, 5: ZZ 
-    h_yield_BB[0] = new TH1F( "h_yield_WW", "Yields in Various Channels from WW;Channel", 9,0,9);
-    h_yield_BB[1] = new TH1F( "h_yield_WH", "Yields in Various Channels from WH;Channel", 9,0,9);
-    h_yield_BB[2] = new TH1F( "h_yield_WZ", "Yields in Various Channels from WZ;Channel", 9,0,9);
-    h_yield_BB[3] = new TH1F( "h_yield_HH", "Yields in Various Channels from HH;Channel", 9,0,9);
-    h_yield_BB[4] = new TH1F( "h_yield_HZ", "Yields in Various Channels from HZ;Channel", 9,0,9);
-    h_yield_BB[5] = new TH1F( "h_yield_ZZ", "Yields in Various Channels from ZZ;Channel", 9,0,9);
-    //for(int i=0;i<nBByields;i++) h_yield_BB[i]
+    string channel_abbrev[nBByields] = {"WW","WH","WZ","HH","HZ","ZZ"};
+    enum yield_BB_indicies{WW=0,WH=1,WZ=2,HH=3,HZ=4,ZZ=5};
+    for(int i=0;i<nBByields;i++) //nominals 
+	    h_yield_BB[i] = new TH1F( (((string)"h_yield_")+channel_abbrev[i]).c_str(), 
+		    (((string)"Yields in Various Channels from ")+channel_abbrev[i]+";Channel").c_str(), 4,0,4);
+
+    for(int i=0;i<nBByields;i++) //nominals 
+	    s_yield_BB[i] = new TH2F( (((string)"s_yield_")+channel_abbrev[i]).c_str(), 
+		    (((string)"Yields in Various Channels from ")+channel_abbrev[i]+";Channel").c_str(), 4,0,4,nSysYields,0,nSysYields);
+
+    for(int i=0;i<nBByields;i++) //nominals 
+	    ps_yield_BB[i] = new TH2F( (((string)"ps_yield_")+channel_abbrev[i]).c_str(), 
+		    (((string)"Yields in Various Channels from ")+channel_abbrev[i]+";Channel").c_str(), 4,0,4,nPolySysYields,0,nPolySysYields);
 
     try{
 		//INITALIZE SPECIAL PLOTS HERE
@@ -293,9 +314,15 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
 
 		//Yield
 		const char *yieldbins[4] = {"eee","eem","emm","mmm"};
-		for (int i=1;i<=4;i++) h_yield->GetXaxis()->SetBinLabel(i,yieldbins[i-1]);
-		if(isSignal){    for (int i=1;i<=4;i++){     for(int j=0;j<nBByields;j++){     h_yield_BB[j]->GetXaxis()->SetBinLabel(i,yieldbins[i-1]); }}} //set bin labels on the BB yields
 
+	for (int i=1;i<=4;i++) h_yield->GetXaxis()->SetBinLabel(i,yieldbins[i-1]);
+	for (int i=1;i<=4;i++) s_yield->GetXaxis()->SetBinLabel(i,yieldbins[i-1]);
+	for (int i=1;i<=4;i++)ps_yield->GetXaxis()->SetBinLabel(i,yieldbins[i-1]);
+	if(isSignal){    
+	    for (int i=1;i<=4;i++){     for(int j=0;j<nBByields;j++){     h_yield_BB[j]->GetXaxis()->SetBinLabel(i,yieldbins[i-1]); }}
+	    for (int i=1;i<=4;i++){     for(int j=0;j<nBByields;j++){     s_yield_BB[j]->GetXaxis()->SetBinLabel(i,yieldbins[i-1]); }}
+	    for (int i=1;i<=4;i++){     for(int j=0;j<nBByields;j++){     ps_yield_BB[j]->GetXaxis()->SetBinLabel(i,yieldbins[i-1]); }}
+	} //set bin labels on the BB yields
 	//INITALIZE SPECIAL-PLOT BACKGROUNDS HERE
 	// 	    b_ST_OSDL1sansS	= init_bkg_TH2F_special("b_ST_OSDL1sansS", kST);
 	// 	    b_MinMlb_OSDL1sanslb= init_bkg_TH2F_special( "b_MinMlb_OSDL1sanslb", "MinMlb", KinVars ); 
@@ -1140,8 +1167,13 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
 	if(makeBkgs) yield_bkg = makeYield(is_elelel, is_elelmu, is_elmumu, is_mumumu, 
 		AlltopoCut->get("NULL",&tcdFALSE)->bkgpass);
 
-
-	if(!dmcblock->isMC){
+	if(printlevel >= 5)cout<<"Check point 1"<< endl;
+	std::vector<double> renorm;                                                                                                                                                              
+	std::vector<double> pdf;                                                                                                                                                                 
+	//this gives a compiler warning because I'm using passing it two pointers which are effectively return values. 
+	if(dmcblock->isMC) doLHEweights(dmcblock, LHEWeightids_singleLepCalc, LHEWeights_singleLepCalc, &renorm, &pdf);
+	if(printlevel >= 5)cout<<"Check point 2"<< endl;
+	else{ //is data
 	    if(is_triLepT){
 		Fill_HLT_study(HLT_coincidience_ele, HLT_map_ele, NEleTriggers, EleTriggerIndicies, viSelTriggersEl_singleLepCalc,false);
 		Fill_HLT_study(HLT_coincidience_mu,  HLT_map_mu , NMuTriggers,  MuTriggerIndicies,  viSelTriggersMu_singleLepCalc,true);
@@ -1151,6 +1183,9 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
 		Fill_HLT_study(HLT_coincidience_mu_main,  HLT_map_mu , NMuTriggers,  MuTriggerIndicies,  viSelTriggersMu_singleLepCalc,true);
 	    }
 	}
+
+	if(printlevel >= 5)cout<<"Check point 3"<< endl;
+
 	//for( std::map<std::string,bool>::iterator thiscut = AlltopoCut->begin(); thiscut != AlltopoCut->end(); thiscut++) {
 	//AlltopoNpass.touch(thiscut->first,0); //if it doesn't exist, make it.
 	//if(thiscut->second) AlltopoNpass.increment(thiscut->first); //if it doesn't exist 
@@ -1230,26 +1265,58 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
 	float weight = (MCWeight_singleLepCalc<0.)? -1. : 1.;
 	weight *= brWeight;
 
-	try{
-//FILL SPECIAL PLOTS HERE.
-// 	    if(AlltopoCut->get_throwable("OSDL1sanslb")->pass) 	h_MinMlb_OSDL1sanslb->Fill(MinMlb,weight);
-// 	    if(AlltopoCut->get_throwable("OSDL1sansS")->pass) 	h_ST_OSDL1sansS->Fill(	ST,weight);
- 	    if(AlltopoCut->get_throwable("main")->pass) 		    h_yield->Fill(yield,weight);
+	float weight_before_PU = weight;
+	double puweight_nominal = puweight260627_69ub[nTrueInteractions_singleLepCalc];
+	double puweight_up =      puweight260627_72ub[nTrueInteractions_singleLepCalc]; 
+	double puweight_down =    puweight260627_65ub[nTrueInteractions_singleLepCalc]; 
+	if(dmcblock->isMC) weight*= puweight_nominal;
+	//puweight260627_72ub
+	//puweight260627_65ub
 
-	}
+	try{
+	    //FILL SPECIAL PLOTS HERE.
+	    if(AlltopoCut->get_throwable("main")->pass){ 
+		h_yield->Fill(yield,weight);
+// 		h_yieldsum->Fill(yield,      weight);
+// 		h_yieldsum->Fill(yieldSumary,weight);
+		if(dmcblock->isMC){
+		    //std::vector<double>* renorm, std::vector<double>* pdf 
+		    FillPSYields(ps_yield,yield,weight_before_PU,   puweight_nominal,puweight_up,puweight_down,   &renorm, &pdf);
+		}
+		if(isSignal){
+		    if(isBWBW_TpTpCalc)	{	
+			h_yield_BB[WW]->Fill(yield, weight);
+			FillPSYields(ps_yield_BB[WW],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+		    }
+		    else if(isTHBW_TpTpCalc){	
+			h_yield_BB[WH]->Fill(yield, weight);
+			FillPSYields(ps_yield_BB[WH],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+		    }
+		    else if(isTZBW_TpTpCalc){	
+			h_yield_BB[WZ]->Fill(yield, weight);
+			FillPSYields(ps_yield_BB[WZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+		    }
+		    else if(isTHTH_TpTpCalc){	
+			h_yield_BB[HH]->Fill(yield, weight);
+			FillPSYields(ps_yield_BB[HH],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+		    }
+		    else if(isTZTH_TpTpCalc){	
+			h_yield_BB[HZ]->Fill(yield, weight);
+			FillPSYields(ps_yield_BB[HZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+		    }
+		    else if(isTZTZ_TpTpCalc){	
+			h_yield_BB[ZZ]->Fill(yield, weight);
+			FillPSYields(ps_yield_BB[ZZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+		    }
+		}//end if signal
+
+	    }//end if main
+	}//end try
 	catch(std::pair <std::string,int> errorpair){
 	    cerr<<"Error cut-filling special plots; Invalid event topology key string \""<<errorpair.first<<"\" sought in AlltopoCut" <<endl;
 	    std::terminate();
 	}
-if(printlevel > 5) cout << "C" << std::endl;
-	if(isSignal){
-	    if(isBWBW_TpTpCalc)		h_yield_BB[0]->Fill(yield, weight);
-	    else if(isTHBW_TpTpCalc)	h_yield_BB[1]->Fill(yield, weight);
-	    else if(isTZBW_TpTpCalc)	h_yield_BB[2]->Fill(yield, weight);
-	    else if(isTHTH_TpTpCalc)	h_yield_BB[3]->Fill(yield, weight);
-	    else if(isTZTH_TpTpCalc)	h_yield_BB[4]->Fill(yield, weight);
-	    else if(isTZTZ_TpTpCalc)	h_yield_BB[5]->Fill(yield, weight);
-	}
+	if(printlevel > 5) cout << "C" << std::endl;
 
 if(printlevel > 5) cout << "D" << std::endl;
 	if(makeBkgs){ //fill bkg specials
@@ -1512,8 +1579,15 @@ if(printlevel > 5) cout << "I" << std::endl;
 if(printlevel > 5) cout << "J" << std::endl;
 	//Write the specials 
 	h_yield->Write();
-if(printlevel > 5) cout << "K" << std::endl;
-	if(isSignal) for(int i=0;i<nBByields;i++) h_yield_BB[i]->Write();
+
+	Convert_nPolySysYields_to_nSysYields(s_yield,ps_yield);
+	s_yield->Write();
+	
+	if(isSignal){
+	    for(int i=0;i<nBByields;i++) h_yield_BB[i]->Write();
+	    for(int i=0;i<nBByields;i++) Convert_nPolySysYields_to_nSysYields(s_yield_BB[i],ps_yield_BB[i]);
+	    for(int i=0;i<nBByields;i++) s_yield_BB[i]->Write();
+	}
 
 // 	h_MinMlb_OSDL1sanslb->Write();
 // 	h_ST_OSDL1sansS->Write();
@@ -1941,4 +2015,136 @@ if(printlevel > 5) cout << "K" << std::endl;
 	    }
 	}//end first loop
     }//end Fill_HLT_study
+
+void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vector<double>  *LHEWeights_singleLepCalc, 
+	std::vector<double>* renorm, std::vector<double>* pdf  ){
+	//fetches a vector of 6 renormalization weights and a vector of 100 pdf weights. 
+	//you are to take the envelope of the renormalization weights and something like the stdev of the fills with pdf weights. 
+	//this is computationally wasteful. 
+
+	if(block->type <=0) return;//if data, do nothing 
+
+	if(block->type > 0 and block->type < 10)//if is signal //all signal, b/c it uses a 4 flavor pdf instead of a 5 flavor pdf->
+	{
+		for(unsigned int i = 0; i < LHEWeightids_singleLepCalc->size(); i++){ //for every LHE weight ID:
+			int LHEweightID = LHEWeightids_singleLepCalc->at(i);
+// 			cout<<"Check point 1-b-1, LHEWeightids_singleLepCalc->at("<<i<<") = "<< LHEWeightids_singleLepCalc->at(i) << endl;
+// 			cout<<"					, LHEWeights_singleLepCalc->at("<<i<<") = "<< LHEWeights_singleLepCalc->at(i) << endl;
+			if(LHEweightID < 10 and LHEweightID > 1 and LHEweightID != 6 and LHEweightID != 8){ //ID in {2,3,4,5,7,9}
+				renorm->push_back(LHEWeights_singleLepCalc->at(i));
+				//renormWeights.push_back(LHEWeights_singleLepCalc->at(i));
+			}
+			if(LHEweightID > 111 && LHEweightID < 212){ //if ID is in 
+				pdf->push_back(LHEWeights_singleLepCalc->at(i));
+			}
+		}//end for.
+	}//end signal
+	else if(//all madgraphMLM
+			block->type == 85 or  //QCD_HTXtoY_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_25ns
+			block->type == 111 or //WJetsToLNu_HT-XToY_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_25ns
+			block->type == 113 or //WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
+			block->type == 49)    //TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_25ns 
+	{
+		cout<<"Check point 1-f"<< endl;
+		for(unsigned int i = 0; i < LHEWeightids_singleLepCalc->size(); i++){
+			int LHEweightID = LHEWeightids_singleLepCalc->at(i);
+			if(LHEweightID < 10 and LHEweightID > 1 and LHEweightID != 6 and LHEweightID != 8){ //ID in {2,3,4,5,7,9}
+				renorm->push_back(LHEWeights_singleLepCalc->at(i));
+				//renormWeights.push_back(LHEWeights_singleLepCalc->at(i));
+			}
+			if(LHEweightID < 111 and LHEweightID > 10){
+				pdf->push_back(LHEWeights_singleLepCalc->at(i));
+			}
+		}//end for
+	}
+	else
+	{ //all MCNLO, all powheg, all pythia
+		cout<<"Check point 1-g"<< endl;
+		for(unsigned int i = 0; i < LHEWeightids_singleLepCalc->size(); i++){
+			int LHEweightID = LHEWeightids_singleLepCalc->at(i);
+			if(LHEweightID > 1001 and LHEweightID < 1010 and LHEweightID != 1006 and LHEweightID != 1008){
+				renorm->push_back(LHEWeights_singleLepCalc->at(i));
+				//renormWeights.push_back(LHEWeights_singleLepCalc->at(i));
+			}
+			else if(LHEweightID > 2000 and LHEweightID < 2101){
+				pdf->push_back(LHEWeights_singleLepCalc->at(i));
+			}
+			//else if(LHEweightID == 2101 or LHEweightID == 2102){
+			//	alphaSWeights.push_back(LHEWeights_singleLepCalc->at(i));
+			//}
+		}//end for
+	}
+}//doLHEweights
+
+void FillPSYields(TH2F* ps_yield,float yield,float weight_before_PU,   double puweight_nominal,double puweight_up,double puweight_down, std::vector<double>* renorm, std::vector<double>* pdf ){
+	//fills ps_yields with 
+    float nominalweight = weight_before_PU*puweight_nominal;
+    ps_yield->Fill(yield,nominalweight,1);//nominal, identical to h_yield
+    ps_yield->Fill(yield,weight_before_PU*puweight_down,2);//PU uncertainty shifted down
+    ps_yield->Fill(yield,weight_before_PU*puweight_up,3);//PU uncertianty shifted up
+    int next_row = 4;
+    for(int i=0;i<nRenorm;++i) ps_yield->Fill(yield,nominalweight*(*renorm)[i],next_row+i);//renorm uncertainties and nominal PU. 
+    for(int i=0;i<nPDF;++i) ps_yield->Fill(yield,nominalweight*(*pdf)[i],next_row+nRenorm+i);//with pdf uncertainties and nominal PU
+}//end FillPSYields;
+
+void Convert_nPolySysYields_to_nSysYields(TH2F* s_yield,TH2F* ps_yield){
+    int nx = ps_yield->GetNbinsX();
+
+    //copy the first three rows
+    for(int j=1;j<=3;++j){
+	for(int i=0;i<=nx+1;i++){
+	    s_yield->SetBinContent(i,j,ps_yield->GetBinContent(i,j));
+	    s_yield->SetBinError(i,j,ps_yield->GetBinError(i,j));
+	}//for every column
+    }//for 3 rows
+    int next_row = 4;
+
+	//get envelop of the next nRenorm rows. 
+    for(int i=0;i<=nx+1;i++){
+	float max = 0.f;
+	float max_unc = 0.f;
+	float min = 9999999999.f;
+	float min_unc = 0.f;
+	for(int j=next_row;j<next_row+nRenorm;++j){
+		float thisbin = ps_yield->GetBinContent(i,j);
+		if(thisbin < min){
+		    min = thisbin;
+		    min_unc = ps_yield->GetBinError(i,j);
+		}
+		if(thisbin > max){
+		    max = thisbin;
+		    max_unc = ps_yield->GetBinError(i,j);
+		}
+	}
+	s_yield->SetBinContent(i,next_row,min);
+	s_yield->SetBinError(i,next_row,min_unc);
+	
+	s_yield->SetBinContent(i,next_row+1,max);
+	s_yield->SetBinError(i,next_row+1,max_unc);
+    }//for every column
+
+	//reduce the pdf entries
+    for(int i=0;i<=nx+1;i++){
+	std::vector<val_err_pair*> col;
+	for(int j=next_row+nRenorm; j<nPolySysYields;++j){
+	    //transfer the column into a vector of val_err_pairs.
+	    val_err_pair *apair = new val_err_pair();
+	    apair->val = ps_yield->GetBinContent(i,j);
+	    apair->err = ps_yield->GetBinError(  i,j);
+	    col.push_back(apair);
+	}
+	std::sort( col.begin(), col.end() );
+	//after sort, smallest is in front.
+        s_yield->SetBinContent(i,next_row+2,col[15]->val); //1 sigma low 
+        s_yield->SetBinError(  i,next_row+2,col[15]->err);
+
+        s_yield->SetBinContent(i,next_row+3,col[83]->val);//1 sigma high
+        s_yield->SetBinError(  i,next_row+3,col[83]->err);
+    }//end for every column. 
+
+}//end Convert_nPolySysYields_to_nSysYields
+
+bool VEpairCompare(val_err_pair* firstElem, val_err_pair* secondElem) {
+	return firstElem->val > secondElem->val;
+}
 
