@@ -173,8 +173,8 @@ std::vector<DMCclass*> setupDMCclasses(){
 	}
 
 	DMCclasses.push_back(new DMCclass("WJetToLNuf",111,vb,{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},false)); //25ns
-	DMCclasses.push_back(new DMCclass("WJetToLNu_madgraphf",vb[mb["WJetToLNu_madgraph"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
-	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
+// 	DMCclasses.push_back(new DMCclass("WJetToLNu_madgraphf",vb[mb["WJetToLNu_madgraph"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
+// 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
 	DMCclasses.push_back(new DMCclass("VVf",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
