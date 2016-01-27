@@ -46,17 +46,19 @@ TH1F* extrackBkg(TH2F* bkg_hist);
 TH1F* make_ratio_uncertainty_hist(TH1F* data, TH1F* bkg);
 void fix_negatives(TH1F* hist);
 void fix_negativesX(TH2F* hist);
+void check_for_negatives(TH1F* hist);
 string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg, string dir, 
 								std::vector<string> SigtoInclude, int SignalInflationFactor,
 								string dataClassName, 
 								std::vector<DMCclass*> vBkgClasses, 
 								std::vector<DMCclass*> vBkgClassesUP, 
-								std::vector<DMCclass*> vBkgClassesDOWN );
+								std::vector<DMCclass*> vBkgClassesDOWN 
+								bool draw_ddbkg);
 string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg,    string dir, 
-	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN );
+	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN, bool draw_ddbkg );
 std::vector<thetaSigFile*> MakeThetaRootFile_Yield_signalScan(stringmap<std::vector<TH1F*>> Signal_yields,  std::vector<DMCclass*> vSigClassesAll,string dir, int nBRslices);
 TH1F* brRescale( std::vector<TH1F*> hists, float bWbr, float tHbr, string outname);
-string MakeThetaCounts(histtable htable, histmap2D* histmapbkg, string SigClassToUse, std::vector<DMCclass*> vBkgClasses);
+string MakeThetaCounts(histtable htable, histmap2D* histmapbkg, string SigClassToUse, std::vector<DMCclass*> vBkgClasses,bool draw_ddbkg);
 
 string ThetaFileNameSig(string directory, string classname, double bWbr, double tHbr);
 float get_bZbr(float bWbr, float tHbr);
@@ -77,6 +79,7 @@ void post(){
 	///////////////////////////// Switcehs //////////////////////////////////////
 	//Most switches are on the control pannel. 
 	bool saveImages = true;
+	bool draw_ddbkg  = false;
 	//
 	bool makeStackPlots_lin = false;
 	bool makeStackPlots_lin_ratio = false;
@@ -494,6 +497,7 @@ void post(){
 		    std::vector<TH1F*> hists_for_set_range;
 
 		    TH1F* ddbkghist = histmapbkg1D.get_throwable(*iplot,20);
+		    check_for_negatives(ddbkghist);
 		    TH1F* datahist = htable.get_throwable(dataClassName,7)->get_throwable(*iplot,8);
 
 		    for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
@@ -515,7 +519,7 @@ void post(){
 		    PrettyMarker(ddbkghist,ddbkgcolor,20,0.);
 		    PrettyFillColor(ddbkghist, ddbkgcolor);
 		    ddbkghist->SetBinErrorOption(TH1::kPoisson);
-		    leg_left->AddEntry(ddbkghist,"DD Bkg");
+		    if(draw_ddbkg) leg_left->AddEntry(ddbkghist,"DD Bkg");
 
 			//compute legend division
 		    int nTotal = vBkgClasses.size() + SigtoInclude.size() + showData+1; //use this for splitting the legend in two
@@ -535,8 +539,8 @@ void post(){
 			if(i++ <= nBkgLeft) leg_left->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 			else               leg_right->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 		    }//end for all the Backgrounds
-		    sstack->Add( ddbkghist);//hopefully this will be the top of the stack.  //this line is not the problem.
-                    background->Add(ddbkghist);
+		    if(draw_ddbkg) sstack->Add( ddbkghist);//hopefully this will be the top of the stack.  //this line is not the problem.
+                    if(draw_ddbkg) background->Add(ddbkghist);
 		    hists_for_set_range.push_back(background);
 
 		    //void SameRange_and_leave_legend_room(std::vector<TH1F*> hists, float legendFraction=0., Double_t _min = -1.0, Double_t _max = -1.0);
@@ -630,6 +634,7 @@ void post(){
 		    std::vector<TH1F*> hists_for_set_range;
 
 		    TH1F* ddbkghist = histmapbkg1D.get_throwable(*iplot,20);
+		    check_for_negatives(ddbkghist);
 		    TH1F* datahist = htable.get_throwable(dataClassName,7)->get_throwable(*iplot,8);
 
 		    for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
@@ -649,7 +654,7 @@ void post(){
 		    PrettyMarker(ddbkghist,ddbkgcolor,20,0.);
 		    PrettyFillColor(ddbkghist, ddbkgcolor);
 		    ddbkghist->SetBinErrorOption(TH1::kPoisson);
-		    leg_left->AddEntry(ddbkghist,"DD Bkg");
+		    if(draw_ddbkg) leg_left->AddEntry(ddbkghist,"DD Bkg");
 
 			//compute legend division
 		    int nTotal = vBkgClasses.size() + SigtoInclude.size() + showData+1; //use this for splitting the legend in two
@@ -670,8 +675,8 @@ void post(){
 			if(i++ <= nBkgLeft) leg_left->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 			else               leg_right->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 		    }//end for all the Backgrounds
-		    sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
-		    background->Add(ddbkghist);
+		    if(draw_ddbkg) sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
+		    if(draw_ddbkg) background->Add(ddbkghist);
 		    hists_for_set_range.push_back(background);
 
 		    //SameRange_and_leave_legend_room(hists_for_set_range, 0.37,false,0.05); //fix scale: 
@@ -786,6 +791,7 @@ void post(){
 		    std::vector<TH1F*> hists_for_set_range;
 
 		    TH1F* ddbkghist = histmapbkg1D.get_throwable(*iplot,20);
+		    check_for_negatives(ddbkghist);
 		    TH1F* datahist = htable.get_throwable(dataClassName,7)->get_throwable(*iplot,8);
 
 		    for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
@@ -829,8 +835,8 @@ void post(){
 			if(i++ <= nBkgLeft) leg_left->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 			else               leg_right->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 		    }//end for all the Backgrounds
-		    sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
-		    background->Add(ddbkghist);
+		    if(draw_ddbkg) sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
+		    if(draw_ddbkg) background->Add(ddbkghist);
 		    hists_for_set_range.push_back(background);
 
 
@@ -925,6 +931,7 @@ void post(){
 		    std::vector<TH1F*> hists_for_set_range;
 
 		    TH1F* ddbkghist = histmapbkg1D.get_throwable(*iplot,20);
+		    check_for_negatives(ddbkghist);
 		    TH1F* datahist = htable.get_throwable(dataClassName,7)->get_throwable(*iplot,8);
 
 		    for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
@@ -946,7 +953,7 @@ void post(){
 		    PrettyMarker(ddbkghist,ddbkgcolor,20,0.);
 		    PrettyFillColor(ddbkghist, ddbkgcolor);
 		    ddbkghist->SetBinErrorOption(TH1::kPoisson);
-		    leg_left->AddEntry(ddbkghist,"DD Bkg");
+		    if(draw_ddbkg) leg_left->AddEntry(ddbkghist,"DD Bkg");
 
 			//compute legend division
 		    int nTotal = vBkgClasses.size() + SigtoInclude.size() + showData+1; //use this for splitting the legend in two
@@ -969,8 +976,8 @@ void post(){
 			if(i++ <= nBkgLeft) leg_left->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 			else               leg_right->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 		    }//end for all the backgrounds
-		    sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
-		    background->Add(ddbkghist);
+		    if(draw_ddbkg) sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
+		    if(draw_ddbkg) background->Add(ddbkghist);
 		    hists_for_set_range.push_back(background);
 
 		    SameRange_and_leave_legend_room_log(hists_for_set_range, 0.37,false,0.05); //fix scale: 
@@ -1114,7 +1121,7 @@ void post(){
 		    PrettyMarker(ddbkghist,ddbkgcolor,20,0.);
 		    PrettyFillColor(ddbkghist, ddbkgcolor);
 		    ddbkghist->SetBinErrorOption(TH1::kPoisson);
-		    leg_left->AddEntry(ddbkghist,"DD Bkg");
+		    if(draw_ddbkg) leg_left->AddEntry(ddbkghist,"DD Bkg");
 
 			//compute legend division
 		    int nTotal = vBkgClasses.size() + SigtoInclude.size() + showData+1; //use this for splitting the legend in two
@@ -1137,8 +1144,8 @@ void post(){
 			if(i++ <= nBkgLeft) leg_left->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 			else               leg_right->AddEntry( thishist, (*iclass)->string_meta["LegendLabel"].c_str() );
 		    }//end for all the backgrounds
-		    sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
-		    background->Add(ddbkghist);
+		    if(draw_ddbkg) sstack->Add( ddbkghist);//hopefully this will be the top of the stack. 
+		    if(draw_ddbkg) background->Add(ddbkghist);
 		    hists_for_set_range.push_back(background);
 
 		    SameRange_and_leave_legend_room_log(hists_for_set_range, 0.37,false,0.05); //fix scale: 
@@ -1236,7 +1243,7 @@ void post(){
 	// added by rizki - make S/sqrt{S+B} plot intead of ratio - end
 	
 	//added by rizki - output for Theta - start
-	if(produceThetaOut)MakeThetaRootFile_Yield(htable,histmapbkg,"forTheta", SigtoInclude, SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN );
+	if(produceThetaOut)MakeThetaRootFile_Yield(htable,histmapbkg,"forTheta", SigtoInclude, SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	//added by rizki - output for Theta - end
 
 	//close all the files you opened. 
@@ -1269,7 +1276,7 @@ TH1F* extrackBkg(TH2F* bkg_hist){
 
 
 string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg,    string dir, 
-	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN ){
+	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN,bool draw_ddbkg ){
 	//takes in a heap of histograms and produces a root file with all those histograms. 
 	//
 	//This takes in Data, all backgrounds, and all their variations, and writes them to a file.
@@ -1316,7 +1323,9 @@ string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg
 	ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
 	ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
 	ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
-	for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+	if(draw_ddbkg){
+	    for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+	}
 		
 	}//end try
 	catch(std::pair <std::string,int> errorpair){
@@ -1330,11 +1339,11 @@ string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg
 
 	f->Close();
 	return filename;
-} //end MakeThetaRootFile_Yield
+} //end MakeThetaRootFile_Yield_nonsignal
 
 //added by rizki - start
 string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    string dir, std::vector<string> SigtoInclude, int SignalInflationFactor,
-	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN ){
+	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN ,bool draw_ddbkg){
 	//takes in a heap of histograms and produces a root file with all those histograms. 
 	//
 	//This takes in Data, all backgrounds, and all their variations, and writes them to a file.
@@ -1366,13 +1375,13 @@ string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    strin
 			thisbkghist->Write();
 		}
 		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass<vBkgClassesUP.end();iclass++){ //for every bkg class
-				//PSES = Parton Shower Eneryg Scale up
+			//PSES = Parton Shower Eneryg Scale up
 			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
 			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__plus").c_str());
 			thisbkghistclone->Write();
 		}
 		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass<vBkgClassesDOWN.end();iclass++){ //for every bkg class
-				//PSES = Parton Shower Eneryg Scale down
+			//PSES = Parton Shower Eneryg Scale down
 			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
 			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__minus").c_str());
 			thisbkghistclone->Write();
@@ -1388,7 +1397,9 @@ string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    strin
 		ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
 		ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
 		ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
-		for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+		if(draw_ddbkg){
+		    for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+		}
 		
 	}//end try
 	catch(std::pair <std::string,int> errorpair){
@@ -1474,7 +1485,7 @@ float get_bZbr(float bWbr, float tHbr){
     return tZbr;
 }
 
-string MakeThetaCounts(histtable htable, histmap2D* histmapbkg, string SigClassToUse, std::vector<DMCclass*> vBkgClasses){
+string MakeThetaCounts(histtable htable, histmap2D* histmapbkg, string SigClassToUse, std::vector<DMCclass*> vBkgClasses, bool draw_ddbkg){
 	//Here you're going to do the simplest thing. 
 	//1. Get a all the background hists, add them into one hist. 
 	//2. Then get the signal hists, add them into one hist. 
@@ -1512,7 +1523,9 @@ string MakeThetaCounts(histtable htable, histmap2D* histmapbkg, string SigClassT
 	    ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone("yield__DDBKG__failrate__minus");
 // 	    ddbks[5] = (TH1F*) hslice(ddbkgs,1)->Clone("yield__DDBKG__qMisIDrate__plus");
 // 	    ddbks[6] = (TH1F*) hslice(ddbkgs,1)->Clone("yield__DDBKG__qMisIDrate__minus");
-	    for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+	    if(draw_ddbkg){
+		for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+	    }
 
 	}//end try
 	catch(std::pair <std::string,int> errorpair){
@@ -1526,7 +1539,7 @@ string MakeThetaCounts(histtable htable, histmap2D* histmapbkg, string SigClassT
 
 	f->Close();
 	return filename;
-} //end MakeThetaRootFile_Yield
+} //end MakeThetaCounts
 
 TH1F* make_ratio_uncertainty_hist(TH1F* data, TH1F* bkg){
 	//Will return a histogram with bin values 1, but error bars equal to the 
@@ -1615,3 +1628,12 @@ void fix_negativesX(TH2F* hist){
 	}//end if there's no divide by zero error. 
     }//end for y
 }
+
+void check_for_negatives(TH1F* hist){
+	bool has_neg = false;
+	for(int i=1;i<=hist->GetNbinsX() and not has_neg;i++){
+		if(hist->GetBinContent(i)<0) has_neg = true;
+	}//for
+	if(has_neg) cout<<"Hist still has negatives "<<hist->GetName()<<endl;
+}
+
