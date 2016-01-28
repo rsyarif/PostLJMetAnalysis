@@ -1188,11 +1188,11 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	else{ //is data
 	    if(is_triLepT){
 		Fill_HLT_study(HLT_coincidience_ele, HLT_map_ele, NEleTriggers, EleTriggerIndicies, viSelTriggersEl_singleLepCalc,false);
-		Fill_HLT_study(HLT_coincidience_mu,  HLT_map_mu , NMuTriggers,  MuTriggerIndicies,  viSelTriggersMu_singleLepCalc,true);
+		Fill_HLT_study(HLT_coincidience_mu,  HLT_map_mu , NMuTriggers,  MuTriggerIndicies,  viSelTriggersMu_singleLepCalc,false);
 	    }
 	    if(AlltopoCut->get("main",&tcdFALSE)->pass){
 		Fill_HLT_study(HLT_coincidience_ele_main, HLT_map_ele, NEleTriggers, EleTriggerIndicies, viSelTriggersEl_singleLepCalc,false);
-		Fill_HLT_study(HLT_coincidience_mu_main,  HLT_map_mu , NMuTriggers,  MuTriggerIndicies,  viSelTriggersMu_singleLepCalc,true);
+		Fill_HLT_study(HLT_coincidience_mu_main,  HLT_map_mu , NMuTriggers,  MuTriggerIndicies,  viSelTriggersMu_singleLepCalc,false);
 	    }
 	}
 
@@ -2066,7 +2066,7 @@ void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vect
 		}//end for
 	}
 	//REMOVE - below - once these block types dataset are fixed / rerun on LJMet !!
-   	else if(block->type == 17 || block->type == 19 || block->type == 131){ //KLUGE. 
+   	else if(block->type == 17 || block->type == 19 || block->type == 131 || block->name == "STtWf_BTag_up"){ //KLUGE. 
 		for(int i=0;i<nRenorm;++i) renorm->push_back(1.);
 		for(int i=0;i<nPDF;++i) pdf->push_back(1.);
 	}
