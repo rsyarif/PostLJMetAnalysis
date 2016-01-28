@@ -2066,7 +2066,7 @@ void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vect
 		}//end for
 	}
 	//REMOVE - below - once these block types dataset are fixed / rerun on LJMet !!
-   	else if(block->type == 17 || block->type == 19 || block->type == 131 || block->name == "STtWf_BTag_up"){ //KLUGE. 
+   	else if(block->type == 17 || block->type == 19 || block->type == 131 || block->name == "STtWf_BTag_up" || block->name == "STtWf_JEC_up" || block->name == "STtWf_JEC_down" || block->name =="STtWf_JER_up" || block->name =="STtWf_JER_down"){ //KLUGE. 
 		for(int i=0;i<nRenorm;++i) renorm->push_back(1.);
 		for(int i=0;i<nPDF;++i) pdf->push_back(1.);
 	}
