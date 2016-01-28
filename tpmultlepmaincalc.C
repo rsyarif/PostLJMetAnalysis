@@ -134,7 +134,7 @@ static const double puweight260627_65ub[60] = {1.458817e+02, 1.724645e+02, 1.043
 //  /_____/\____/\____/ .___/ 
 //                   /_/      
 //
-void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
+void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEventRegistry)
 {
     cout<<"Loop lives"<<endl;
     ofstream firealarm;
@@ -538,6 +538,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
 	//xxmu
 	if(printlevel >= 5) cout<<"Begind muons"<<endl;
 	float MuT = 0;
+	float lep_Mini_Iso_SF = 1.;
+	float lep_MVA_ID_SF = 1.;
 	TLorentzVector VLep(0,0,0,0);
 	/*if(nLooseMuons_CommonCalc != (int)muEnergy_singleLepCalc->size() ){
 	  if(nTightMuons_CommonCalc != (int)muEnergy_singleLepCalc->size() )
@@ -933,6 +935,16 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
 		continue;
 		}
 	}//end if isData
+	else{ //unrelated; if it is MC, figure the lepton scale factors
+	    for(int iele = 0; iele<nTightEle; ++iele){
+		lep_MVA_ID_SF   *= Get_Ele_MVA_ID_SF(   (*elPt_singleLepCalc)[TightEleIndicies[iele]], (*elEta_singleLepCalc)[TightEleIndicies[iele]]);
+		lep_Mini_Iso_SF *= Get_Ele_Mini_Iso_SF( (*elPt_singleLepCalc)[TightEleIndicies[iele]], (*elEta_singleLepCalc)[TightEleIndicies[iele]]);
+	    }
+	    for(int imu = 0; imu<nTightMuons; ++imu){
+		lep_MVA_ID_SF   *= Get_Muon_MVA_ID_SF(   (*muPt_singleLepCalc)[TightMuonIndicies[imu]], (*muEta_singleLepCalc)[TightMuonIndicies[imu]]);
+		lep_Mini_Iso_SF *= Get_Muon_Mini_Iso_SF( (*muPt_singleLepCalc)[TightMuonIndicies[imu]], (*muEta_singleLepCalc)[TightMuonIndicies[imu]]);
+	    }
+	}//end else if is MC
 
 	/////////////////////////////////////////////////////////////////
 	//////////////////////// FIND JETS  /////////////////////////////
@@ -1263,8 +1275,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry)
 	if(printlevel > 5) cout << "check point B" << endl; //debug rizki
 
 	float weight = (MCWeight_singleLepCalc<0.)? -1. : 1.;
-	weight *= brWeight;
-
+	weight *= brWeight*lep_Mini_Iso_SF*lep_MVA_ID_SF;;
+	if(printlevel > 5) cout << "check point B-1" << endl; //debug rizki
 	float weight_before_PU = weight;
 	double puweight_nominal = puweight260627_69ub[nTrueInteractions_singleLepCalc];
 	double puweight_up =      puweight260627_72ub[nTrueInteractions_singleLepCalc]; 
@@ -2021,15 +2033,12 @@ void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vect
 	//fetches a vector of 6 renormalization weights and a vector of 100 pdf weights. 
 	//you are to take the envelope of the renormalization weights and something like the stdev of the fills with pdf weights. 
 	//this is computationally wasteful. 
-
 	if(block->type <=0) return;//if data, do nothing 
 
 	if(block->type > 0 and block->type < 10)//if is signal //all signal, b/c it uses a 4 flavor pdf instead of a 5 flavor pdf->
 	{
 		for(unsigned int i = 0; i < LHEWeightids_singleLepCalc->size(); i++){ //for every LHE weight ID:
 			int LHEweightID = LHEWeightids_singleLepCalc->at(i);
-// 			cout<<"Check point 1-b-1, LHEWeightids_singleLepCalc->at("<<i<<") = "<< LHEWeightids_singleLepCalc->at(i) << endl;
-// 			cout<<"					, LHEWeights_singleLepCalc->at("<<i<<") = "<< LHEWeights_singleLepCalc->at(i) << endl;
 			if(LHEweightID < 10 and LHEweightID > 1 and LHEweightID != 6 and LHEweightID != 8){ //ID in {2,3,4,5,7,9}
 				renorm->push_back(LHEWeights_singleLepCalc->at(i));
 				//renormWeights.push_back(LHEWeights_singleLepCalc->at(i));
@@ -2045,7 +2054,6 @@ void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vect
 			block->type == 113 or //WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
 			block->type == 49)    //TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_25ns 
 	{
-		cout<<"Check point 1-f"<< endl;
 		for(unsigned int i = 0; i < LHEWeightids_singleLepCalc->size(); i++){
 			int LHEweightID = LHEWeightids_singleLepCalc->at(i);
 			if(LHEweightID < 10 and LHEweightID > 1 and LHEweightID != 6 and LHEweightID != 8){ //ID in {2,3,4,5,7,9}
@@ -2057,9 +2065,14 @@ void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vect
 			}
 		}//end for
 	}
+	//REMOVE - below - once these block types dataset are fixed / rerun on LJMet !!
+   	else if(block->type == 17 || block->type == 19 || block->type == 131){ //KLUGE. 
+		for(int i=0;i<nRenorm;++i) renorm->push_back(1.);
+		for(int i=0;i<nPDF;++i) pdf->push_back(1.);
+	}
+	//REMOVE - above - once STf dataset is rerun on LJMet !!
 	else
 	{ //all MCNLO, all powheg, all pythia
-		cout<<"Check point 1-g"<< endl;
 		for(unsigned int i = 0; i < LHEWeightids_singleLepCalc->size(); i++){
 			int LHEweightID = LHEWeightids_singleLepCalc->at(i);
 			if(LHEweightID > 1001 and LHEweightID < 1010 and LHEweightID != 1006 and LHEweightID != 1008){
@@ -2083,7 +2096,11 @@ void FillPSYields(TH2F* ps_yield,float yield,float weight_before_PU,   double pu
     ps_yield->Fill(yield,weight_before_PU*puweight_down,2);//PU uncertainty shifted down
     ps_yield->Fill(yield,weight_before_PU*puweight_up,3);//PU uncertianty shifted up
     int next_row = 4;
-    for(int i=0;i<nRenorm;++i) ps_yield->Fill(yield,nominalweight*(*renorm)[i],next_row+i);//renorm uncertainties and nominal PU. 
+    for(int i=0;i<nRenorm;++i){
+//     	cout << "check point B-4-a, i = " << i << ", (*renorm).size() = "<< (*renorm).size() << endl; //debug rizki
+// 		cout << " *(renorm)["<<i<<"] = "<< (*renorm)[i] << endl;
+    	ps_yield->Fill(yield,nominalweight*(*renorm)[i],next_row+i);//renorm uncertainties and nominal PU. 
+    }
     for(int i=0;i<nPDF;++i) ps_yield->Fill(yield,nominalweight*(*pdf)[i],next_row+nRenorm+i);//with pdf uncertainties and nominal PU
 }//end FillPSYields;
 

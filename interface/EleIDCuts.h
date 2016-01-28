@@ -150,6 +150,11 @@ int btreeSearch(float x, float ranges[], int size);
 //float MCsmear(float eta, float r9,TRandom* r);
 //float MCsmear_fullsim(float eta, float r9,TRandom* r);
 
+float Get_Ele_MVA_ID_SF(float leppt, float lepeta);
+float Get_Muon_Mini_Iso_SF(float leppt, float lepeta);
+float Get_Ele_Mini_Iso_SF(float leppt, float lepeta);
+float Get_Muon_MVA_ID_SF(float leppt, float lepeta);
+
 // end prototyping
 
 static const float MuMiniIsoThreshTight = 0.2;
@@ -879,5 +884,223 @@ int btreeSearch(float x, float ranges[], int size){
     return low;
 }//btreeSearch
 */
+
+float Get_Muon_Mini_Iso_SF(float leppt, float lepeta){
+    //Mini-iso < 0.2 SFs from SUSY TWiki
+    float isosf = 1.f;
+    lepeta = fabs(lepeta);
+    if(leppt<40){
+	if(lepeta < 0.9) {isosf= 1.000; }
+	else if(lepeta< 1.2) {isosf= 1.000; }
+	else if(lepeta< 2.1) {isosf= 0.999; }
+	else if(lepeta< 2.4) {isosf= 0.999; }
+    }
+    else if(leppt<50){
+	if(lepeta < 0.9) {isosf= 1.000; }
+	else if(lepeta< 1.2) {isosf= 1.000; }
+	else if(lepeta< 2.1) {isosf= 0.999; }
+	else if(lepeta< 2.4) {isosf= 1.000; }
+    }
+    else if(leppt<60){
+	if(lepeta < 0.9) {isosf= 1.000; }
+	else if(lepeta< 1.2) {isosf= 1.000; }
+	else if(lepeta< 2.1) {isosf= 1.000; }
+	else if(lepeta< 2.4) {isosf= 1.000; }
+    }
+    else{
+	if(lepeta < 0.9) {isosf= 1.000; }
+	else if(lepeta< 1.2) {isosf= 0.999; }
+	else if(lepeta< 2.1) {isosf= 0.998; }
+	else if(lepeta< 2.4) {isosf= 1.000; }
+    }
+    return isosf;
+}//end Get_Muon_Mini_Iso_SF
+
+float Get_Ele_Mini_Iso_SF(float leppt, float lepeta){
+    //miniIso < 0.1 scale factors from https://indico.cern.ch/event/370512/contribution/1/attachments/1176496/1701148/2015_10_26_tnp.pdf
+    float isosf = 1.f;
+    if(leppt<=10) return isosf;
+    lepeta = fabs(lepeta);
+    if(lepeta<1.442){
+	if(leppt<20) {isosf = 0.979; }// +/-0.004 
+	else if(leppt<30) {isosf = 0.988; }// +/-0.002
+	else if(leppt<40) {isosf = 0.995; }// +/-0.022
+	else if(leppt<50) {isosf = 0.995; }// +/-0.011
+	else if(leppt<200) {isosf = 0.995; }// +/-0.000
+    }
+    else if(lepeta<1.566){
+	if(leppt<20) {isosf = 0.909; }// +/-0.05 
+	else if(leppt<30) {isosf = 0.982; }// +/-0.014
+	else if(leppt<40) {isosf = 1.001; }// +/-0.006
+	else if(leppt<50) {isosf = 0.993; }// +/-0.007
+	else if(leppt<200) {isosf = 0.988; }// +/-0.014
+    }
+    else if(lepeta<2.5){
+	if(leppt<20) {isosf = 0.984; }// +/-0.011
+	else if(leppt<30) {isosf = 0.997; }// +/-0.002
+	else if(leppt<40) {isosf = 1.000; }// +/-0.001
+	else if(leppt<50) {isosf = 1.019; }// +/-0.002
+	else if(leppt<200) {isosf = 1.000; }// +/-0.002
+    }
+    //else {isosf = 1.; }
+    return isosf;
+}//end Get_Ele_Mini_Iso_SF
+
+float Get_Muon_MVA_ID_SF(float leppt, float lepeta){
+    //Cut-based ID scale factors from Clint Richardson 
+    //https://indico.cern.ch/event/459111/contribution/1/attachments/1180755/1709309/B2G_Meeting_11.03.2015.pdf
+    float lepidsf = 1.f;
+    if(leppt<30.0) return lepidsf;
+    if(lepeta>=-2.4 && lepeta<-2.1){
+	if(leppt<40.0000) {lepidsf= 0.9812; }
+	else if(leppt<60.0000) {lepidsf= 0.9793; } 
+	else if(leppt<100.0000) {lepidsf= 0.9600; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9738; }
+    } 
+    else if(lepeta<-1.2){
+	if(leppt<40.0000) {lepidsf= 0.9910; } 
+	else if(leppt<60.0000) {lepidsf= 0.9922; } 
+	else if(leppt<100.0000) {lepidsf= 0.9923; }
+	else if(leppt<1000.0000) {lepidsf= 1.0039; }
+    }
+    else if(lepeta<-0.9){ 
+	if(leppt<40.0000) {lepidsf= 0.9828; } 
+	else if(leppt<60.0000) {lepidsf= 0.9886; } 
+	else if(leppt<100.0000) {lepidsf= 0.9873; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9876; }
+    }
+    else if(lepeta<-0.4){ 
+	if(leppt<40.0000) {lepidsf= 0.9909; } 
+	else if(leppt<60.0000) {lepidsf= 0.9920; } 
+	else if(leppt<100.0000) {lepidsf= 0.9854; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9951; }
+    }
+    else if(lepeta<0.0){ 
+	if(leppt<40.0000) {lepidsf= 0.9878; } 
+	else if(leppt<60.0000) {lepidsf= 0.9874; } 
+	else if(leppt<100.0000) {lepidsf= 0.9885; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9985; }
+    }
+    else if(lepeta<0.4){
+	if(leppt<40.0000) {lepidsf= 0.9847; } 
+	else if(leppt<60.0000) {lepidsf= 0.9877; } 
+	else if(leppt<100.0000) {lepidsf= 0.9896; } 
+	else if(leppt<1000.0000) {lepidsf= 1.0165; }
+    }
+    else if(lepeta<0.9){ 
+	if(leppt<40.0000) {lepidsf= 0.9869; } 
+	else if(leppt<60.0000) {lepidsf= 0.9898; } 
+	else if(leppt<100.0000) {lepidsf= 0.9875; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9754; }
+    }
+    else if(lepeta<1.2){ 
+	if(leppt<40.0000) {lepidsf= 0.9724; } 
+	else if(leppt<60.0000) {lepidsf= 0.9746; } 
+	else if(leppt<100.0000) {lepidsf= 0.9696; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9757; }
+    }
+    else if(lepeta<2.1){ 
+	if(leppt<40.0000) {lepidsf= 0.9929; } 
+	else if(leppt<60.0000) {lepidsf= 0.9947; } 
+	else if(leppt<100.0000) {lepidsf= 0.9929; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9987; }
+    }
+    else if(lepeta<2.4){ 
+	if(leppt<40.0000) {lepidsf= 0.9818; } 
+	else if(leppt<60.0000) {lepidsf= 0.9851; } 
+	else if(leppt<100.0000) {lepidsf= 0.9724; } 
+	else if(leppt<1000.0000) {lepidsf= 1.0028; }
+    }
+    //else{lepidsf= 1.0; } 
+    return lepidsf;
+}//end Get_Muon_MVA_ID_SF
+
+float Get_Ele_MVA_ID_SF(float leppt, float lepeta){
+    float lepidsf =1.f;
+    if(leppt<30.0) return lepidsf;
+
+    if(lepeta>=-2.5 && lepeta<-1.6){
+	if(leppt<40.0000) {lepidsf= 0.9880; }
+	else if(leppt<50.0000) {lepidsf= 0.9663; } 
+	else if(leppt<70.0000) {lepidsf= 0.9884; }
+	else if(leppt<90.0000) {lepidsf= 0.9762; } 
+	else if(leppt<130.0000) {lepidsf= 0.9727; } 
+	else if(leppt<180.0000) {lepidsf= 0.9978; } 
+	else if(leppt<250.0000) {lepidsf= 0.9118; }
+	else if(leppt<1000.0000) {lepidsf= 0.9205; }
+    } 
+    else if(lepeta<-1.4){
+	if(leppt<40.0000) {lepidsf= 0.9788; } 
+	else if(leppt<50.0000) {lepidsf= 0.9821; } 
+	else if(leppt<70.0000) {lepidsf= 0.9567; } 
+	else if(leppt<90.0000) {lepidsf= 0.9926; } 
+	else if(leppt<130.0000) {lepidsf= 0.9889; } 
+	else if(leppt<180.0000) {lepidsf= 1.0034; } 
+	else if(leppt<250.0000) {lepidsf= 1.1316; } 
+	else if(leppt<1000.0000) {lepidsf= 1.0000; }
+    }
+    else if(lepeta<-0.8){
+	if(leppt<40.0000) {lepidsf= 0.9945; }
+	else if(leppt<50.0000) {lepidsf= 0.9849; } 
+	else if(leppt<70.0000) {lepidsf= 0.9944; }
+	else if(leppt<90.0000) {lepidsf= 1.0008; } 
+	else if(leppt<130.0000) {lepidsf= 1.0077; } 
+	else if(leppt<180.0000) {lepidsf= 0.9915; } 
+	else if(leppt<250.0000) {lepidsf= 0.9556; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9274; }
+    } 
+    else if(lepeta<0.0){
+	if(leppt<40.0000) {lepidsf= 0.9923; } 
+	else if(leppt<50.0000) {lepidsf= 0.9794; } 
+	else if(leppt<70.0000) {lepidsf= 0.9887; } 
+	else if(leppt<90.0000) {lepidsf= 0.9742; } 
+	else if(leppt<130.0000) {lepidsf= 0.9611; } 
+	else if(leppt<180.0000) {lepidsf= 1.0176; } 
+	else if(leppt<250.0000) {lepidsf= 0.9990; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9677; }
+    } 
+    else if(lepeta<0.8){
+	if(leppt<40.0000) {lepidsf= 0.9990; } 
+	else if(leppt<50.0000) {lepidsf= 0.9808; } 
+	else if(leppt<70.0000) {lepidsf= 0.9657; } 
+	else if(leppt<90.0000) {lepidsf= 0.9963; } 
+	else if(leppt<130.0000) {lepidsf= 0.9963; } 
+	else if(leppt<180.0000) {lepidsf= 0.9725; } 
+	else if(leppt<250.0000) {lepidsf= 0.9769; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9334; }
+    } 
+    else if(lepeta<1.4){
+	if(leppt<40.0000) {lepidsf= 0.9934; } 
+	else if(leppt<50.0000) {lepidsf= 0.9814; } 
+	else if(leppt<70.0000) {lepidsf= 0.9871; } 
+	else if(leppt<90.0000) {lepidsf= 0.9846; } 
+	else if(leppt<130.0000) {lepidsf= 0.9545; } 
+	else if(leppt<180.0000) {lepidsf= 1.0141; } 
+	else if(leppt<250.0000) {lepidsf= 0.9824; } 
+	else if(leppt<1000.0000) {lepidsf= 0.9443; }
+    } 
+    else if(lepeta<1.6){
+	if(leppt<40.0000) {lepidsf= 0.9771; } 
+	else if(leppt<50.0000) {lepidsf= 0.9796; } 
+	else if(leppt<70.0000) {lepidsf= 0.9811; } 
+	else if(leppt<90.0000) {lepidsf= 1.0291; } 
+	else if(leppt<130.0000) {lepidsf= 0.9010; } 
+	else if(leppt<180.0000) {lepidsf= 1.0490; } 
+	else if(leppt<250.0000) {lepidsf= 0.6082; } 
+	else if(leppt<1000.0000) {lepidsf= 1.1424; }
+    } 
+    else if(lepeta<2.5){
+	if(leppt<40.0000) {lepidsf= 0.9746; } 
+	else if(leppt<50.0000) {lepidsf= 0.9835; } 
+	else if(leppt<70.0000) {lepidsf= 0.9868; } 
+	else if(leppt<90.0000) {lepidsf= 0.9843; } 
+	else if(leppt<130.0000) {lepidsf= 1.0039; } 
+	else if(leppt<180.0000) {lepidsf= 0.9597; } 
+	else if(leppt<250.0000) {lepidsf= 0.9987; } 
+	else if(leppt<1000.0000) {lepidsf= 1.0271; }
+    }
+    //else{lepidsf= 1.0; }
+    return lepidsf;
+}//end Get_Ele_MVA_ID_SF
 
 #endif
