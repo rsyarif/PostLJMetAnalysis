@@ -122,18 +122,18 @@ std::vector<DMCclass*> setupDMCclasses(){
 	    temp->add(vb[mb["STtbarWDOWNs"]]);
 	    temp->add(vb[mb["STtWDOWNs"]]);
 	    DMCclasses.push_back(temp); }*/
-	{ DMCclass* temp = new DMCclass("STUPf",vb[mb["STtchUPf"]],ST_int_meta, null_float_meta, ST_string_meta,false);
-	    temp->add(vb[mb["STtbarWUPf"]]);
-	    temp->add(vb[mb["STtWUPf"]]);
+	{ DMCclass* temp = new DMCclass("STf__PSES__plus",vb[mb["STtchf_PSES_up"]],ST_int_meta, null_float_meta, ST_string_meta,false);
+	    temp->add(vb[mb["STtbarWf_PSES_up"]]);
+	    temp->add(vb[mb["STtWf_PSES_up"]]);
 	    DMCclasses.push_back(temp); }
 
 	/*{ DMCclass* temp = new DMCclass("STs",vb[mb["STtchs"]],ST_int_meta, null_float_meta, ST_string_meta,true);
 	    temp->add(vb[mb["STtbarWs"]]);
 	    temp->add(vb[mb["STtWs"]]);
 	    DMCclasses.push_back(temp); }*/
-	{ DMCclass* temp = new DMCclass("STDOWNf",vb[mb["STtchDOWNf"]],ST_int_meta, null_float_meta, ST_string_meta,false);
-	    temp->add(vb[mb["STtbarWDOWNf"]]);
-	    temp->add(vb[mb["STtWDOWNf"]]);
+	{ DMCclass* temp = new DMCclass("STf__PSES__minus",vb[mb["STtchf_PSES_down"]],ST_int_meta, null_float_meta, ST_string_meta,false);
+	    temp->add(vb[mb["STtbarWf_PSES_down"]]);
+	    temp->add(vb[mb["STtWf_PSES_down"]]);
 	    DMCclasses.push_back(temp); }
 
 	/*{ DMCclass* temp = new DMCclass("STUPs",vb[mb["STtchUPs"]],ST_int_meta, null_float_meta, ST_string_meta,true);
@@ -145,8 +145,8 @@ std::vector<DMCclass*> setupDMCclasses(){
 	namedInt ttj_int_meta= {{"FillColor",kViolet-5},{"LineColor",kViolet-5},{"isData",0},{"isSignal",0}};
 	namedString ttj_string_meta= {{"LegendLabel","t#bar{t}"}};
 	DMCclasses.push_back(new DMCclass("ttjf",vb[mb["ttj_highstatsf"]],ttj_int_meta, null_float_meta, ttj_string_meta,false));
-	DMCclasses.push_back(new DMCclass("ttjDOWNf",vb[mb["ttjDOWNf"]],ttj_int_meta, null_float_meta, ttj_string_meta,false));
-	DMCclasses.push_back(new DMCclass("ttjUPf",vb[mb["ttjUPf"]],ttj_int_meta, null_float_meta, ttj_string_meta,false));
+	DMCclasses.push_back(new DMCclass("ttjf__PSES__minus",vb[mb["ttjf_PSES_down"]],ttj_int_meta, null_float_meta, ttj_string_meta,false));
+	DMCclasses.push_back(new DMCclass("ttjf__PSES__plus",vb[mb["ttjf_PSES_up"]],ttj_int_meta, null_float_meta, ttj_string_meta,false));
 
 	/*DMCclasses.push_back(new DMCclass("ttjs",vb[mb["ttjs"]],ttj_int_meta, null_float_meta, ttj_string_meta,true));
 	DMCclasses.push_back(new DMCclass("ttjDOWNs",vb[mb["ttjDOWNs"]],ttj_int_meta, null_float_meta, ttj_string_meta,true));
