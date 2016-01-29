@@ -11,8 +11,8 @@ using namespace std;
 void runall(){
 	clock_t startfor = clock();
 	bool rundata = true;
-// 	std::vector<DMCblock*> vp = setupDMCblocks();
-// 	std::vector<DMCblock*> vp_BTag_up = setupDMCblocks_BTag_up();
+	std::vector<DMCblock*> vp = setupDMCblocks();
+	std::vector<DMCblock*> vp_BTag_up = setupDMCblocks_BTag_up();
 	std::vector<DMCblock*> vp_BTag_down = setupDMCblocks_BTag_down();
 	std::vector<DMCblock*> vp_JEC_up = setupDMCblocks_JEC_up();
 	std::vector<DMCblock*> vp_JEC_down = setupDMCblocks_JEC_down();
@@ -23,7 +23,7 @@ void runall(){
 	eventRegistry EventRegistry;
 	eventRegistry BadEventRegistry;
 	if(rundata) populate_BadEventRegistry(&BadEventRegistry,true);
-	/*for(std::vector<DMCblock*>::iterator dit = vp.begin(); dit != vp.end(); dit++){
+	for(std::vector<DMCblock*>::iterator dit = vp.begin(); dit != vp.end(); dit++){
 		cout<<"in for"<<endl;
 		if((*dit)->Tis50ns_Fis25ns) continue; //don't run 50ns swill
 		//if((*dit)->type <0 ) continue; //don't data
@@ -35,8 +35,8 @@ void runall(){
 		t->Loop(&EventRegistry,&BadEventRegistry);
 		clock_t endloop= clock();
 		cout << "Block "<<(*dit)->name<<" ran in "<<((float) (endloop - startloop))/CLOCKS_PER_SEC<<" seconds"<<endl;
-	}//end for all blocks */
-	/*for(std::vector<DMCblock*>::iterator dit = vp_BTag_up.begin(); dit != vp_BTag_up.end(); dit++){
+	}//end for all blocks 
+	for(std::vector<DMCblock*>::iterator dit = vp_BTag_up.begin(); dit != vp_BTag_up.end(); dit++){
 		cout<<"in for"<<endl;
 		if((*dit)->Tis50ns_Fis25ns) continue; //don't run 50ns swill
 		//if((*dit)->type <0 ) continue; //don't data
@@ -48,7 +48,7 @@ void runall(){
 		t->Loop(&EventRegistry,&BadEventRegistry);
 		clock_t endloop= clock();
 		cout << "Block "<<(*dit)->name<<" ran in "<<((float) (endloop - startloop))/CLOCKS_PER_SEC<<" seconds"<<endl;
-	}//end for all BTag_up blocks */
+	}//end for all BTag_up blocks 
 	for(std::vector<DMCblock*>::iterator dit = vp_BTag_down.begin(); dit != vp_BTag_down.end(); dit++){
 		cout<<"in for"<<endl;
 		if((*dit)->Tis50ns_Fis25ns) continue; //don't run 50ns swill
@@ -61,7 +61,7 @@ void runall(){
 		t->Loop(&EventRegistry,&BadEventRegistry);
 		clock_t endloop= clock();
 		cout << "Block "<<(*dit)->name<<" ran in "<<((float) (endloop - startloop))/CLOCKS_PER_SEC<<" seconds"<<endl;
-	}//end for all BTag_down blocks
+	}//end for all BTag_down blocks 
 	for(std::vector<DMCblock*>::iterator dit = vp_JEC_up.begin(); dit != vp_JEC_up.end(); dit++){
 		cout<<"in for"<<endl;
 		if((*dit)->Tis50ns_Fis25ns) continue; //don't run 50ns swill
@@ -74,7 +74,7 @@ void runall(){
 		t->Loop(&EventRegistry,&BadEventRegistry);
 		clock_t endloop= clock();
 		cout << "Block "<<(*dit)->name<<" ran in "<<((float) (endloop - startloop))/CLOCKS_PER_SEC<<" seconds"<<endl;
-	}//end for all JEC_up blocks
+	}//end for all JEC_up blocks 
 	for(std::vector<DMCblock*>::iterator dit = vp_JEC_down.begin(); dit != vp_JEC_down.end(); dit++){
 		cout<<"in for"<<endl;
 		if((*dit)->Tis50ns_Fis25ns) continue; //don't run 50ns swill
