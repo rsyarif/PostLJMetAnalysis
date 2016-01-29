@@ -138,6 +138,12 @@ bool IsKinvar(string kinvar){
     const string savewhat = "gCpdfpngroot";//ggifpdfeps
     const float SignalInflationFactor = 1000; //scale up the signal by this much. 
     const bool divideOutBinWidths = 1;
+	
+	//Controls for including up/downs files in post.C - added by rizki - start
+    const bool useBTagSys = true;
+    const bool useJECsys = true;
+    const bool useJERsys = false;
+	//Controls for including up/downs files in post.C - added by rizki - end
 
 	string plotsdirC   = "plots/C/";
 	string plotsdirroot ="plots/root/";

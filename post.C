@@ -47,8 +47,11 @@ TH1F* make_ratio_uncertainty_hist(TH1F* data, TH1F* bkg);
 void fix_negatives(TH1F* hist);
 void fix_negativesX(TH2F* hist);
 void check_for_negatives(TH1F* hist);
-string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg, string dir, 
-								std::vector<string> SigtoInclude, int SignalInflationFactor,
+string MakeThetaRootFile_Yield(string varname_, histtable htable, histmap2D* histmapbkg, string dir,
+								std::vector<DMCclass*> vSigClassesAll, 
+								std::vector<DMCclass*> vSigClassesUP, 
+								std::vector<DMCclass*> vSigClassesDOWN, 
+								int SignalInflationFactor,
 								string dataClassName, 
 								std::vector<DMCclass*> vBkgClasses, 
 								std::vector<DMCclass*> vBkgClassesUP, 
@@ -87,7 +90,7 @@ void post(){
 	bool makeStackPlots_log = false;
 	bool makeStackPlots_log_ratio = false;
 	
-	bool makeStackPlots_log_SBsignif = true ; //added by rizki
+	bool makeStackPlots_log_SBsignif = false ; //added by rizki
 	bool produceThetaOut = true;
 
 	///////////////////////////// Lists  //////////////////////////////////////
@@ -101,13 +104,13 @@ void post(){
 	plotdirs.set("eps", plotsdireps );
 
 
-	SigtoInclude.push_back(string("TpTp700")+(T50ns_F25ns?"s":"f"));
-// 	SigtoInclude.push_back(string("TpTp800")+(T50ns_F25ns?"s":"f"));
-	SigtoInclude.push_back(string("TpTp1200")+(T50ns_F25ns?"s":"f"));
+	SigtoInclude.push_back(string("sigTpTp700")+(T50ns_F25ns?"s":"f"));
+// 	SigtoInclude.push_back(string("sigTpTp800")+(T50ns_F25ns?"s":"f"));
+	SigtoInclude.push_back(string("sigTpTp1200")+(T50ns_F25ns?"s":"f"));
 	string dataClassName = string("Data2lep")+(T50ns_F25ns?"s":"f");
 
-		//MAKE A LIST OF ALL THE PLOT NAMES TO LOAD IN: "plotnames", AND BKG PLOT NAMES "bkgplotnames"
-		//Map the plotname or bkgplotname  to the kinvar in chosenkinvar_stringmap.set
+	//MAKE A LIST OF ALL THE PLOT NAMES TO LOAD IN: "plotnames", AND BKG PLOT NAMES "bkgplotnames"
+	//Map the plotname or bkgplotname  to the kinvar in chosenkinvar_stringmap.set
 	try{
 	    //Special plots to load in
 
@@ -147,39 +150,40 @@ void post(){
 	//Make a list vClasses of all the classes to run
 	DMCclass* dataClass = setupDMCclass( dataClassName);
 	std::vector<DMCclass*> vBkgClasses     = MCbkgDMCclass(T50ns_F25ns);//bkgs that will go on the plot. 
-	std::vector<DMCclass*> vBkgClassesDOWN = MCbkgDMCclassDOWN(T50ns_F25ns);
-	std::vector<DMCclass*> vBkgClassesUP   = MCbkgDMCclassUP(T50ns_F25ns);
+	std::vector<DMCclass*> vBkgClassesDOWN = MCbkgDMCclassDOWN(T50ns_F25ns, useBTagSys, useJECsys, useJERsys);
+	std::vector<DMCclass*> vBkgClassesUP   = MCbkgDMCclassUP(T50ns_F25ns, useBTagSys, useJECsys, useJERsys);
 	std::vector<DMCclass*> vSigClassesAll = MCTpTpsigDMCclass(T50ns_F25ns);//all the signal classes, used for limits. 
 	std::vector<DMCclass*> vSigClasses; //The signal classes to go on the plots
-	std::vector<DMCclass*> vClasses; //mostly a copy of vBkgClasses, but with MC and data appended. 
-	std::vector<DMCclass*> vClassesAll; 
-	
-		//vectorize all the classes 
-//		cout<<"Background Classes:"<<endl;
-	for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass< vBkgClasses.end();iclass++){
-	    //cout<<(*iclass)->name<<endl;
-	    vClasses.push_back((*iclass));
-	}
 
-		//find the signal classes you want on the plots. add them to vSigClasses and vClasses. 
+	std::vector<DMCclass*> vSigClassesUP = MCTpTpsigDMCclassUP(T50ns_F25ns, useBTagSys, useJECsys, useJERsys); 
+	std::vector<DMCclass*> vSigClassesDOWN = MCTpTpsigDMCclassDOWN(T50ns_F25ns, useBTagSys, useJECsys, useJERsys); 
+
+	std::vector<DMCclass*> vClasses; //mostly a copy of vBkgClasses, but with MC and data appended. 
+	std::vector<DMCclass*> vClassesAll; //data+sig+sig_up/down+bkg+bkg_up/down
+	
+	//vectorize all the classes 
+
+	//find the signal classes you want on the plots. add them to vSigClasses and vClasses. 
 	for(std::vector<string>::iterator istr=SigtoInclude.begin();istr<SigtoInclude.end();istr++){ //for all the chosen siganl classes. 
 	    for(std::vector<DMCclass*>::iterator iclass = vSigClassesAll.begin();iclass< vSigClassesAll.end();iclass++){ //look @ all sig classes
-		if((*iclass)->name.compare(*istr) ==0){ //if it's one of the signal classes you wanted. 
-		    vSigClasses.push_back(*iclass);//add to the list of desired signal classes
-		    vClasses.push_back(*iclass); //and add it to the list of all classes for the plots .
-		    break;
-		}
+			if((*iclass)->name.compare(*istr) ==0){ //if it's one of the signal classes you wanted. 
+				vSigClasses.push_back(*iclass);//add to the list of desired signal classes
+				vClasses.push_back(*iclass); //and add it to the list of all classes for the plots .
+				break;
+			}
 	    }
 	}
 	//for(std::vector<string>::iterator    istr   =SigtoInclude.begin();istr  <SigtoInclude.end();istr++)vSigClasses.push_back(setupDMCclass(*istr));
 	//for(std::vector<DMCclass*>::iterator iclass = vSigClasses.begin();iclass< vSigClasses.end();iclass++) vClasses.push_back((*iclass));
 	vClasses.push_back(dataClass);
-
 	stringmap<DMCclass*>* mClasses =  makemap(vClasses);
+// 	for(std::vector<DMCclass*>::iterator iclass = vClasses.begin();iclass< vClasses.end();iclass++) vClassesAll.push_back((*iclass));
 
-	////
-
-	for(std::vector<DMCclass*>::iterator iclass = vClasses.begin();iclass< vClasses.end();iclass++) vClassesAll.push_back((*iclass));
+	vClassesAll.push_back(dataClass);
+	for(std::vector<DMCclass*>::iterator iclass = vSigClassesAll.begin();iclass< vSigClassesAll.end();iclass++)vClassesAll.push_back((*iclass));
+	for(std::vector<DMCclass*>::iterator iclass = vSigClassesUP.begin();iclass< vSigClassesUP.end();iclass++) vClassesAll.push_back((*iclass));
+	for(std::vector<DMCclass*>::iterator iclass = vSigClassesDOWN.begin();iclass< vSigClassesDOWN.end();iclass++) vClassesAll.push_back((*iclass));
+	for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass< vBkgClasses.end();iclass++)vClassesAll.push_back((*iclass));
 	for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass< vBkgClassesUP.end();iclass++) vClassesAll.push_back((*iclass));
 	for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass< vBkgClassesDOWN.end();iclass++) vClassesAll.push_back((*iclass));
 	stringmap<DMCclass*>* mClassesAll =  makemap(vClassesAll);
@@ -222,7 +226,7 @@ void post(){
 				}
 				//cout<<"fetching "<<*iplot<<endl;
 
-                        	TH1F* temp = (TH1F*)vFiles.back()->Get((*iplot).c_str());//
+                TH1F* temp = (TH1F*)vFiles.back()->Get((*iplot).c_str());//
 				TH1F* temp2;
 				if(firstround) temp2 = (TH1F*)temp->Clone((*iplot + "_" + (*iclass)->name ).c_str());
 				else           temp2 = (TH1F*)temp->Clone((*iplot + "_" + (*iblock)->name ).c_str());
@@ -346,13 +350,13 @@ void post(){
 	    int thisfile = start_of_data_in_vFiles++;
 	    vFiles[thisfile]->cd();//cd to the data files. This only works if ddbkgclass only contains dataClass.
 
-	    //cout<<"loading for block "<<(*iblock)->name<<endl;
+// 	    cout<<"loading for block "<<(*iblock)->name<<endl;
 	    for(std::vector<string>::iterator iplot = bkgplotnames.begin(); iplot<bkgplotnames.end();iplot++){
 		if(not vFiles[thisfile]->GetListOfKeys()->Contains((*iplot).c_str()) ){
 		    cerr<<"Error! Cannot find plot "<<*iplot<<" in file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
 		    std::terminate();
 		}
-		//cout<<"fetching "<<*iplot<<endl;
+// 		cout<<"fetching "<<*iplot<<endl;
 
 		TH2F* temp = (TH2F*)vFiles[thisfile]->Get((*iplot).c_str());///fix.
 		//cout<<"bkg "<<(*iblock)->name<<" plot "<<*iplot<<" first bkg bin: "<<temp->GetBinContent(1,1)<<endl;//xxx
@@ -459,18 +463,18 @@ void post(){
       int MCcolorDef = kMagenta+2; 
 
 	//Common procedure: 
+      //Inflate selected signals
       try{
-	  for(std::vector<string>::iterator iplot = plotnames.begin(); iplot<plotnames.end();iplot++){
-	      for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
-		  htable.get_throwable(*imc,5)->get_throwable(*iplot,6)->Scale(SignalInflationFactor); 
-	      }
-	  }
+		  for(std::vector<string>::iterator iplot = plotnames.begin(); iplot<plotnames.end();iplot++){
+			  for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
+			  htable.get_throwable(*imc,5)->get_throwable(*iplot,6)->Scale(SignalInflationFactor); 
+			  }
+		  }
       }//end try;
       catch(std::pair <std::string,int> errorpair){
-	  cerr<<"Stringmap Error! While making StackPlots, Invalid string key "<<errorpair.first<< " error code "<<errorpair.second<<endl;
-	  std::terminate();
+		  cerr<<"Stringmap Error! While making StackPlots, Invalid string key "<<errorpair.first<< " error code "<<errorpair.second<<endl;
+		  std::terminate();
       }
-
 
 
 	if(makeStackPlots_lin){
@@ -567,9 +571,9 @@ void post(){
 				PrettyMarker(thishist,linecolor,20,0.);
 				//thishist->Sumw2();
 				thishist->Draw("samehisto");
-				int thisTpMass = mClasses->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
+				int thisTpMass = mClassesAll->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
 				leg_left->AddEntry(thishist, ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
-				//leg_left->AddEntry(thishist,mClasses->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
+				//leg_left->AddEntry(thishist,mClassesAll->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
 				whichmc++;
 		    }
 			cout<<"drawing hist "<<*iplot<<endl; //problem is after here. 
@@ -703,9 +707,9 @@ void post(){
 			PrettyMarker(thishist,linecolor,20,0.);
 			//thishist->Sumw2();
 			thishist->Draw("samehisto");
-			int thisTpMass = mClasses->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
+			int thisTpMass = mClassesAll->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
 			leg_left->AddEntry(thishist, ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
-			//leg_left->AddEntry(thishist,mClasses->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
+			//leg_left->AddEntry(thishist,mClassesAll->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
 			whichmc++;
 		    }
 			cout<<"drawing hist "<<*iplot<<endl; //problem is after here. 
@@ -865,9 +869,9 @@ void post(){
 			PrettyMarker(thishist,linecolor,20,0.);
 			//thishist->Sumw2();
 			thishist->Draw("samehisto");
-			int thisTpMass = mClasses->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
+			int thisTpMass = mClassesAll->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
 			leg_left->AddEntry(thishist, ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
-			//leg_left->AddEntry(thishist,mClasses->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
+			//leg_left->AddEntry(thishist,mClassesAll->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
 			whichmc++;
 		    }
 			cout<<"drawing hist "<<*iplot<<endl; //problem is after here. 
@@ -1003,9 +1007,9 @@ void post(){
 			PrettyMarker(thishist,linecolor,20,0.);
 			//thishist->Sumw2();
 			thishist->Draw("samehisto");
-			int thisTpMass = mClasses->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
+			int thisTpMass = mClassesAll->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
 			leg_left->AddEntry(thishist, ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
-			//leg_left->AddEntry(thishist,mClasses->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
+			//leg_left->AddEntry(thishist,mClassesAll->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
 			whichmc++;
 		    }
 			cout<<"drawing hist "<<*iplot<<endl; //problem is after here. 
@@ -1171,9 +1175,9 @@ void post(){
 				PrettyMarker(thishist,linecolor,20,0.);
 				//thishist->Sumw2();
 				thishist->Draw("samehisto");
-				int thisTpMass = mClasses->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
+				int thisTpMass = mClassesAll->get_throwable(*imc,7)->blocks[0]->int_meta["TprimeMass"];//xxx update class with metainfo	
 				leg_left->AddEntry(thishist, ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
-				//leg_left->AddEntry(thishist,mClasses->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
+				//leg_left->AddEntry(thishist,mClassesAll->get_throwable(*imc,7)->string_meta["LegendLabel"].c_str()); // ("T'#bar{T}' ("+to_string(thisTpMass) + " GeV) x " + to_string((int) SignalInflationFactor)).c_str() );//xxx could use update with metainfo
 				whichmc++;
 		    }
 			cout<<"drawing hist "<<*iplot<<endl; //problem is after here. 
@@ -1243,8 +1247,23 @@ void post(){
 	} //end StackPlots
 	// added by rizki - make S/sqrt{S+B} plot intead of ratio - end
 	
+	//undo SignalInflationFactor - added by rizki - start
+	try{
+		for(std::vector<string>::iterator iplot = plotnames.begin(); iplot<plotnames.end();iplot++){
+			  for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
+			  htable.get_throwable(*imc,5)->get_throwable(*iplot,6)->Scale(1./SignalInflationFactor); 
+			  }
+		}
+    }//end try;
+    catch(std::pair <std::string,int> errorpair){
+		cerr<<"Stringmap Error! While making StackPlots, Invalid string key "<<errorpair.first<< " error code "<<errorpair.second<<endl;
+		std::terminate();
+    }
+	//undo SignalInflationFactor - added by rizki - end	
+	
 	//added by rizki - output for Theta - start
-	if(produceThetaOut)MakeThetaRootFile_Yield(htable,histmapbkg,"forTheta", SigtoInclude, SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL", htable,histmapbkg,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain", htable,histmapbkg,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	//added by rizki - output for Theta - end
 
 	//close all the files you opened. 
@@ -1343,48 +1362,71 @@ string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg
 } //end MakeThetaRootFile_Yield_nonsignal
 
 //added by rizki - start
-string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    string dir, std::vector<string> SigtoInclude, int SignalInflationFactor,
-	string dataClassName, std::vector<DMCclass*> vBkgClasses, std::vector<DMCclass*> vBkgClassesUP, std::vector<DMCclass*> vBkgClassesDOWN ,bool draw_ddbkg){
+string MakeThetaRootFile_Yield(	string varname_, histtable htable, histmap2D* histmapbkg, string dir, 
+								std::vector<DMCclass*> vSigClassesAll, 
+								std::vector<DMCclass*> vSigClassesUP, 
+								std::vector<DMCclass*> vSigClassesDOWN, 
+								int SignalInflationFactor,
+								string dataClassName, 
+								std::vector<DMCclass*> vBkgClasses, 
+								std::vector<DMCclass*> vBkgClassesUP, 
+								std::vector<DMCclass*> vBkgClassesDOWN,
+								bool draw_ddbkg){
 	//takes in a heap of histograms and produces a root file with all those histograms. 
-	//
 	//This takes in Data, all backgrounds, and all their variations, and writes them to a file.
 	
-	string varname = "yieldNULL";
+	string varname = varname_;
 	string plotname = "h_"+varname; 
 
-	string filename = dir+"/hist4limit_yield.root";
+	string filename = dir+"/hist4limit_"+varname+".root";
 	cout<<"writing limit root file to "<<filename<<endl;
 
 	TFile * f = new TFile(filename.c_str(), "RECREATE");
 	f->cd();
 
 	try{
-		//get signal
-		for(std::vector<string>::iterator imc = SigtoInclude.begin();imc<SigtoInclude.end();imc++){
-			TH1F* sighist = (TH1F*)htable.get_throwable(*imc,1)->get_throwable(plotname,2)->Clone((plotname+"_"+(*imc)+"__sig").c_str());
-			sighist->Scale(1./SignalInflationFactor); //undo signalInflationFactor. need scale to 1 pb??
-			sighist->Write();
-		}
-
 		//fetch data. 
 		TH1F* datahist = (TH1F*) htable.get_throwable(dataClassName,1)->get_throwable(plotname,2)->Clone((plotname+"__DATA").c_str());
 		datahist->Write(); 
 
+		//get signal
+		for(std::vector<DMCclass*>::iterator iclass = vSigClassesAll.begin();iclass<vSigClassesAll.end();iclass++){ 
+			TH1F* sighistclone = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
+			float cs_pb_ = (*iclass)->blocks[0]->cs_pb; //assume signal class has one block
+			//cout<< "class: " << (*iclass)->name << ", nblock = "<< (*iclass)->nblocks << ", block: " << (*iclass)->blocks[0]->name << ", cs_pb = " << cs_pb_ << endl;
+			sighistclone->Scale(1./(cs_pb_)); //scale to 1 pb
+			sighistclone->Write();
+		}
+		//write all the UP signal histograms. 
+		for(std::vector<DMCclass*>::iterator iclass = vSigClassesUP.begin();iclass<vSigClassesUP.end();iclass++){ 
+			TH1F* sighistclone = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
+			float cs_pb_ = (*iclass)->blocks[0]->cs_pb; //assume signal class has one block
+			sighistclone->Scale(1./(cs_pb_)); //scale to 1 pb
+			sighistclone->Write();
+		}
+		//write all the DOWN signal histograms. 
+		for(std::vector<DMCclass*>::iterator iclass = vSigClassesDOWN.begin();iclass<vSigClassesDOWN.end();iclass++){ 
+			TH1F* sighistclone = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
+			float cs_pb_ = (*iclass)->blocks[0]->cs_pb; //assume signal class has one block
+			sighistclone->Scale(1./(cs_pb_)); //scale to 1 pb
+			sighistclone->Write();
+		}
 		//write all the background histograms. 
 		for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass<vBkgClasses.end();iclass++){ //for every bkg class
-			TH1F* thisbkghist = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
-			thisbkghist->Write();
-		}
-		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass<vBkgClassesUP.end();iclass++){ //for every bkg class
-			//PSES = Parton Shower Eneryg Scale up
 			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
-			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__plus").c_str());
+			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name).c_str());
 			thisbkghistclone->Write();
 		}
-		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass<vBkgClassesDOWN.end();iclass++){ //for every bkg class
-			//PSES = Parton Shower Eneryg Scale down
+		//write all the UP background histograms. 
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass<vBkgClassesUP.end();iclass++){ //for every bkg class
 			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
-			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__minus").c_str());
+			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name).c_str());
+			thisbkghistclone->Write();
+		}
+		//write all the DOWN background histograms. 
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass<vBkgClassesDOWN.end();iclass++){ //for every bkg class
+			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
+			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name).c_str());
 			thisbkghistclone->Write();
 		}
 
@@ -1405,9 +1447,9 @@ string MakeThetaRootFile_Yield(histtable htable, histmap2D* histmapbkg,    strin
 	}//end try
 	catch(std::pair <std::string,int> errorpair){
 	    switch(errorpair.second ){
-		case 1: cerr<<"Stringmap Error! While making Theta nonsig root files. Invalid string key "<<errorpair.first<< " sought in htable"<<endl; break;
-		case 2: cerr<<"Stringmap Error! While making Theta nonsig root files. Invalid string key "<<errorpair.first<< " sought in htable submap"<<endl; break;
-		case 3: cerr<<"Stringmap Error! While making Theta nonsig root files. Invalid string key "<<errorpair.first<< " sought in histmapbkg"<<endl; break;
+		case 1: cerr<<"Stringmap Error! While making Theta root files. Invalid string key "<<errorpair.first<< " sought in htable"<<endl; break;
+		case 2: cerr<<"Stringmap Error! While making Theta root files. Invalid string key "<<errorpair.first<< " sought in htable submap"<<endl; break;
+		case 3: cerr<<"Stringmap Error! While making Theta root files. Invalid string key "<<errorpair.first<< " sought in histmapbkg"<<endl; break;
 	    }//end switch
 	    std::terminate();
 	}//end catch;
