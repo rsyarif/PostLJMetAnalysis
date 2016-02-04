@@ -1693,6 +1693,48 @@ if(printlevel > 5) cout << "J" << std::endl;
 			B1 && 
 			J3 &&
 			MtSum >=50)); 
+	AlltopoCut->set("ST1100B1J3MtSum50", 
+		new topoCutDecision(is_triLepT,
+			ST>=1100 && 
+			B1 && 
+			J3 &&
+			MtSum >=50)); 
+	AlltopoCut->set("ST1000B1J3MtSum50",
+			new topoCutDecision(is_triLepT,
+                        ST>=1000 &&
+                        B1 &&
+                        J3 &&
+			MtSum >=50));
+	AlltopoCut->set("ST900B1J3MtSum50",
+			new topoCutDecision(is_triLepT,
+                        ST>=900 &&
+                        B1 &&
+                        J3 &&
+			MtSum >=50));
+	AlltopoCut->set("ST800B1J3MtSum50",
+			new topoCutDecision(is_triLepT,
+                        ST>=800 &&
+                        B1 &&
+                        J3 &&
+			MtSum >=50));
+	AlltopoCut->set("ST700B1J3MtSum50",
+			new topoCutDecision(is_triLepT,
+                        ST>=700 &&
+                        B1 &&
+                        J3 &&
+			MtSum >=50));
+	AlltopoCut->set("ST600B1J3MtSum50",
+			new topoCutDecision(is_triLepT,
+                        ST>=600 &&
+                        B1 &&
+                        J3 &&
+			MtSum >=50));
+	AlltopoCut->set("ST500B1J3MtSum50",
+			new topoCutDecision(is_triLepT,
+                        ST>=500 &&
+                        B1 &&
+                        J3 &&
+			MtSum >=50));
 
 			 
 // EXAMPLE:
