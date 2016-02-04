@@ -47,6 +47,7 @@
 #include "eventRegistry.C"
 #include "interface/EleIDCuts.h"
 #include "interface/fakerate_3lep.h"
+#include "interface/JetScaleFactors.h"
 #include "check_dup.C"
 //#include "EventTopology.h"
 
@@ -121,7 +122,7 @@ void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vect
 struct val_err_pair{float val; float err;};
 bool VEpairCompare(val_err_pair* firstElem, val_err_pair* secondElem);
 void Convert_nPolySysYields_to_nSysYields(TH2F* s_yield,TH2F* ps_yield);
-void FillPSYields(TH2F* ps_yield,float yield,float weight_before_PU,   double puweight_nominal,double puweight_up,double puweight_down, std::vector<double>* renorm, std::vector<double>* pdf );
+void FillPSYields(TH2F* ps_yield,float yield,float weight_before_PU,   double puweight_nominal,double puweight_up,double puweight_down, float* jetSFs, std::vector<double>* renorm, std::vector<double>* pdf );
 
 static const double puweight260627_72ub[60] = {1.048445e+02, 1.417593e+02, 8.807366e+01, 3.236995e+01, 1.683957e+01, 2.831305e+00, 1.423759e+00, 1.612828e+00, 2.306693e+00, 2.473619e+00, 2.514170e+00, 2.546666e+00, 2.333108e+00, 1.836848e+00, 1.221869e+00, 6.836922e-01, 3.275329e-01, 1.432766e-01, 6.667120e-02, 3.763312e-02, 2.341225e-02, 1.359301e-02, 6.804618e-03, 2.922054e-03, 1.130104e-03, 4.448707e-04, 2.080687e-04, 1.239100e-04, 8.786009e-05, 6.837745e-05, 5.143024e-05, 3.476586e-05, 1.906542e-05, 9.115409e-06, 3.556074e-06, 1.447242e-06, 5.171527e-07, 1.940254e-07, 6.513423e-08, 2.309190e-08, 7.790329e-09, 2.199365e-09, 6.795396e-10, 1.624286e-10, 4.931596e-11, 1.298753e-11, 7.930341e-12, 2.315454e-12, 1.497868e-11, 2.172998e-12, 9.012326e-14, 1.094585e-14, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00};
 static const double puweight260627_69ub[60] = {1.245238e+02, 1.562054e+02, 9.528614e+01, 3.645428e+01, 2.049345e+01, 3.843197e+00, 2.215886e+00, 2.747772e+00, 3.412640e+00, 3.156122e+00, 2.921218e+00, 2.709273e+00, 2.214740e+00, 1.509242e+00, 8.529270e-01, 4.047681e-01, 1.706805e-01, 7.408239e-02, 3.853898e-02, 2.208110e-02, 1.157933e-02, 5.111779e-03, 1.897273e-03, 6.326908e-04, 2.194698e-04, 9.396686e-05, 5.134064e-05, 3.356329e-05, 2.432826e-05, 1.843384e-05, 1.299881e-05, 8.002472e-06, 3.916437e-06, 1.648432e-06, 5.607770e-07, 1.975807e-07, 6.075239e-08, 1.950465e-08, 5.573450e-09, 1.673234e-09, 4.755563e-10, 1.125301e-10, 2.899281e-11, 5.749377e-12, 1.440875e-12, 3.115802e-13, 1.554955e-13, 3.630806e-14, 2.427227e-13, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00, 0.000000e+00};
@@ -960,6 +961,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	vector<int> JetAK4Indicies;
 	int nJetAK4= 0;
 	float HT = 0;
+	float jetSFs[3] = {1.f}; //enum JetSFmode{JetSFnominal = 0, JetSFup = 1, JetSFdown = 2};
 	TLorentzVector VHad(0,0,0,0);
 	for(int ijet = 0; ijet< (int)AK4JetPt_singleLepCalc->size(); ++ijet){ //jets are approxomately sorted in Pt order. 
 	    //but you saw an instance of
@@ -986,6 +988,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	    if(!jet_passes_DR) continue;
 
 	    //jet passes:
+	    if(dmcblock->isMC) GetJetSF( (*AK4JetPt_singleLepCalc)[ijet], jetSFs);
+
 	    JetAK4Indicies.push_back(ijet);
 	    nJetAK4++;
 	    HT += (*AK4JetPt_singleLepCalc)[ijet];
@@ -1278,10 +1282,19 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	weight *= brWeight*lep_Mini_Iso_SF*lep_MVA_ID_SF;;
 	if(printlevel > 5) cout << "check point B-1" << endl; //debug rizki
 	float weight_before_PU = weight;
-	double puweight_nominal = puweight260627_69ub[nTrueInteractions_singleLepCalc];
-	double puweight_up =      puweight260627_72ub[nTrueInteractions_singleLepCalc]; 
-	double puweight_down =    puweight260627_65ub[nTrueInteractions_singleLepCalc]; 
-	if(dmcblock->isMC) weight*= puweight_nominal;
+	double puweight_nominal = 1.0;
+	double puweight_up =      1.0;
+	double puweight_down =    1.0;
+	if(dmcblock->isMC){
+	    puweight_nominal = puweight260627_69ub[nTrueInteractions_singleLepCalc];
+	    puweight_up =      puweight260627_72ub[nTrueInteractions_singleLepCalc]; 
+	    puweight_down =    puweight260627_65ub[nTrueInteractions_singleLepCalc]; 
+	    weight*= puweight_nominal * jetSFs[JetSFnominal];
+	    /*if((nJetAK4 >= 0 and nJetAK4 < 4 and jentry%100 == 0 ) or 
+		    (nJetAK4 >= 4) )
+		cout<<"nJ: "<<nJetAK4<<" \tJetSF: "<<jetSFs[JetSFnominal]<<"\t weight: "<<weight<<" \tbr*lepSFs "<<weight_before_PU<<" \twPU "<<puweight_nominal<<" \tHT/nJ "<<HT/((float)nJetAK4)<<endl;*/
+	
+	}
 	//puweight260627_72ub
 	//puweight260627_65ub
 
@@ -1293,32 +1306,32 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 // 		h_yieldsum->Fill(yieldSumary,weight);
 		if(dmcblock->isMC){
 		    //std::vector<double>* renorm, std::vector<double>* pdf 
-		    FillPSYields(ps_yield,yield,weight_before_PU,   puweight_nominal,puweight_up,puweight_down,   &renorm, &pdf);
+		    FillPSYields(ps_yield,yield,weight_before_PU,   puweight_nominal,puweight_up,puweight_down,jetSFs,   &renorm, &pdf);
 		}
 		if(isSignal){
 		    if(isBWBW_TpTpCalc)	{	
 			h_yield_BB[WW]->Fill(yield, weight);
-			FillPSYields(ps_yield_BB[WW],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+			FillPSYields(ps_yield_BB[WW],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,jetSFs,  &renorm, &pdf);
 		    }
 		    else if(isTHBW_TpTpCalc){	
 			h_yield_BB[WH]->Fill(yield, weight);
-			FillPSYields(ps_yield_BB[WH],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+			FillPSYields(ps_yield_BB[WH],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,jetSFs,  &renorm, &pdf);
 		    }
 		    else if(isTZBW_TpTpCalc){	
 			h_yield_BB[WZ]->Fill(yield, weight);
-			FillPSYields(ps_yield_BB[WZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+			FillPSYields(ps_yield_BB[WZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,jetSFs,  &renorm, &pdf);
 		    }
 		    else if(isTHTH_TpTpCalc){	
 			h_yield_BB[HH]->Fill(yield, weight);
-			FillPSYields(ps_yield_BB[HH],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+			FillPSYields(ps_yield_BB[HH],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,jetSFs,  &renorm, &pdf);
 		    }
 		    else if(isTZTH_TpTpCalc){	
 			h_yield_BB[HZ]->Fill(yield, weight);
-			FillPSYields(ps_yield_BB[HZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+			FillPSYields(ps_yield_BB[HZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,jetSFs, &renorm, &pdf);
 		    }
 		    else if(isTZTZ_TpTpCalc){	
 			h_yield_BB[ZZ]->Fill(yield, weight);
-			FillPSYields(ps_yield_BB[ZZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,  &renorm, &pdf);
+			FillPSYields(ps_yield_BB[ZZ],yield,weight_before_PU,  puweight_nominal,puweight_up,puweight_down,jetSFs,    &renorm, &pdf);
 		    }
 		}//end if signal
 
@@ -1356,7 +1369,8 @@ if(printlevel > 5) cout << "E" << std::endl;
 		if(topoCut->get_throwable(s_EventTopology[iTopo],1)->pass ){
 		    //float weight = m_BTagWeight[s_EventTopology[iTopo]]->weight(jetInfoVVector);//takes significant time.
 		    LabelHist MapKinVar = lh_unsliced.get_throwable(s_EventTopology[iTopo],2);
-  if(KinVarSwitches->get_throwable("yield",3)) MapKinVar.get_throwable("yield",4)->Fill(yield,weight);
+
+			if(KinVarSwitches->get_throwable("yield",3)) MapKinVar.get_throwable("yield",4)->Fill(yield,weight);
 
 		    //you're using lh_unsliced, which is thing that didn't feel M_gg binning; so always use that.
 		    if(KinVarSwitches->get_throwable("nJ",3)) MapKinVar.get_throwable("nJ",4)->Fill(nJetAK4,weight);
@@ -1460,7 +1474,8 @@ if(printlevel > 5) cout << "F" << std::endl;
 				//float weight = m_BTagWeight[s_EventTopology[iTopo]]->weight(jetInfoVVector);//takes significant time.
 
 				LabelHist2D MapKinVar = lb_unsliced.get_throwable(s_EventTopology[iTopo],2);
-if(KinVarSwitches->get_throwable("yield",3)) FillBkg(MapKinVar.get_throwable("yield",4),yield_bkg, bkgweights, weight);
+
+				if(KinVarSwitches->get_throwable("yield",3)) FillBkg(MapKinVar.get_throwable("yield",4),yield_bkg, bkgweights, weight);
 
 				if(KinVarSwitches->get_throwable("nJ",3)) FillBkg(MapKinVar.get_throwable("nJ",4),nJetAK4, bkgweights, weight);
 				if(KinVarSwitches->get_throwable("nBm",3)) FillBkg(MapKinVar.get_throwable("nBm",4),nBJetAK4CISVm, bkgweights, weight);
@@ -2131,19 +2146,31 @@ void doLHEweights(DMCblock* block, vector<int> *LHEWeightids_singleLepCalc, vect
 	}
 }//doLHEweights
 
-void FillPSYields(TH2F* ps_yield,float yield,float weight_before_PU,   double puweight_nominal,double puweight_up,double puweight_down, std::vector<double>* renorm, std::vector<double>* pdf ){
+void FillPSYields(TH2F* ps_yield,float yield,float weight_before_PU,   double puweight_nominal,double puweight_up,double puweight_down, float* jetSFs, std::vector<double>* renorm, std::vector<double>* pdf ){
 	//fills ps_yields with 
-    float nominalweight = weight_before_PU*puweight_nominal;
+    float nominalJetSF = jetSFs[JetSFnominal];
+    //enum JetSFmode{JetSFnominal = 0, JetSFup = 1, JetSFdown = 2};
+    float nominalweight = weight_before_PU*puweight_nominal*nominalJetSF ;
     ps_yield->Fill(yield,nominalweight,1);//nominal, identical to h_yield
-    ps_yield->Fill(yield,weight_before_PU*puweight_down,2);//PU uncertainty shifted down
-    ps_yield->Fill(yield,weight_before_PU*puweight_up,3);//PU uncertianty shifted up
+    ps_yield->Fill(yield,weight_before_PU*puweight_down*nominalJetSF,2);//PU uncertainty shifted down
+    ps_yield->Fill(yield,weight_before_PU*puweight_up*nominalJetSF,3);//PU uncertianty shifted up
     int next_row = 4;
-    for(int i=0;i<nRenorm;++i){
-//     	cout << "check point B-4-a, i = " << i << ", (*renorm).size() = "<< (*renorm).size() << endl; //debug rizki
-// 		cout << " *(renorm)["<<i<<"] = "<< (*renorm)[i] << endl;
-    	ps_yield->Fill(yield,nominalweight*(*renorm)[i],next_row+i);//renorm uncertainties and nominal PU. 
+
+    if(renorm->size() != nRenorm){
+	cout<<"Error! renorm is too short! Renorm size: "<<renorm->size()<< " pdf size: "<<pdf->size()<< endl;
+	std::terminate();
+    }
+    for(int i=0;i<nRenorm;++i) ps_yield->Fill(yield,nominalweight*(*renorm)[i],next_row+i);//renorm uncertainties and nominal PU. 
+
+    if(pdf->size() != nPDF){
+	cout<<"Error! pdf is wrong size! PDF size: "<<pdf->size()<<endl;
+	std::terminate();
     }
     for(int i=0;i<nPDF;++i) ps_yield->Fill(yield,nominalweight*(*pdf)[i],next_row+nRenorm+i);//with pdf uncertainties and nominal PU
+
+    ps_yield->Fill(yield,weight_before_PU*puweight_nominal*jetSFs[JetSFdown],next_row+nRenorm+nPDF);//Julie Jet SF uncertainty shifted down
+    ps_yield->Fill(yield,weight_before_PU*puweight_nominal*jetSFs[JetSFup],  next_row+nRenorm+nPDF+1);//Julie Jet SF uncertainty shifted up
+
 }//end FillPSYields;
 
 void Convert_nPolySysYields_to_nSysYields(TH2F* s_yield,TH2F* ps_yield){
@@ -2181,6 +2208,7 @@ void Convert_nPolySysYields_to_nSysYields(TH2F* s_yield,TH2F* ps_yield){
 	s_yield->SetBinContent(i,next_row+1,max);
 	s_yield->SetBinError(i,next_row+1,max_unc);
     }//for every column
+    next_row+=2;
 
 	//reduce the pdf entries
     for(int i=0;i<=nx+1;i++){
@@ -2194,12 +2222,21 @@ void Convert_nPolySysYields_to_nSysYields(TH2F* s_yield,TH2F* ps_yield){
 	}
 	std::sort( col.begin(), col.end() );
 	//after sort, smallest is in front.
-        s_yield->SetBinContent(i,next_row+2,col[15]->val); //1 sigma low 
-        s_yield->SetBinError(  i,next_row+2,col[15]->err);
+        s_yield->SetBinContent(i,next_row,col[16-1]->val); //1 sigma low 
+        s_yield->SetBinError(  i,next_row,col[16-1]->err);
 
-        s_yield->SetBinContent(i,next_row+3,col[83]->val);//1 sigma high
-        s_yield->SetBinError(  i,next_row+3,col[83]->err);
+        s_yield->SetBinContent(i,next_row+1,col[84-1]->val);//1 sigma high
+        s_yield->SetBinError(  i,next_row+1,col[84-1]->err);
     }//end for every column. 
+    next_row+=2;
+
+	//transfer the Julie 
+    for(int j=0;j<2;++j){
+	for(int i=0;i<=nx+1;i++){
+	    s_yield->SetBinContent(i,next_row+j, ps_yield->GetBinContent(i,nRenorm+nPDF+4+j) );
+	    s_yield->SetBinError(  i,next_row+j, ps_yield->GetBinError(  i,nRenorm+nPDF+4+j) );
+	}//for every column
+    }//for 2 rows
 
 }//end Convert_nPolySysYields_to_nSysYields
 

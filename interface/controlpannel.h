@@ -145,7 +145,7 @@ bool IsKinvar(string kinvar){
 	//Controls for including up/downs files in post.C - added by rizki - start
     const bool useBTagSys = true;
     const bool useJECsys = true;
-    const bool useJERsys = false;
+    const bool useJERsys = true;
 	//Controls for including up/downs files in post.C - added by rizki - end
 
 	string plotsdirC   = "plots/C/";
@@ -163,13 +163,15 @@ bool IsKinvar(string kinvar){
 	static const int nSysYields = 1+//nominal
 					2+//PU corrections
 					2+//renorm envelope
-					2;//pdf 1 sigmas. 
+					2+//pdf 1 sigmas. 
+					2;//Julie Jet SFs 
 	static const int nRenorm = 6;
 	static const int nPDF = 100;
 	static const int nPolySysYields = 1+//nominal
 					2+//PU corrections
 					nRenorm+//renorm envelope
-					nPDF;//pdf 1 sigmas. 
+					nPDF+//pdf 1 sigmas. 
+					2;//Julie Jet SFs
 	//mode 0 = nominal. 1 = fakerate plus, 2 = fakerate minus, 3 = passrate plus, 4 = passrate minus 5=qg fake plus, 6=qg fake minus.
 	//see feModeBehavior in fakerate.h
 
