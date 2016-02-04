@@ -262,7 +262,7 @@ std::vector<DMCblock*> setupDMCblocks(){
 		//see also https://twiki.cern.ch/twiki/bin/view/CMS/B2GPHYS14 
 		//to use this you would need to get effective ngen that includes negative weights, beware; 50-100 is really >50
 		//float cs_uncert = 0;//xxx
-		//DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
+		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
 		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL50toINFf", 6025.2 , 228.5, 19259107, {{"Mlow",50},{"Mhigh",99999}}, null_float_meta, null_string_meta, true, false, 13., true));
 		//nGen was 19310834, previously 12020067. But the cross section is obviously too big if you do that and DAS says 28825132. That's probably #positibe - #negative. 
 //https://cmsweb.cern.ch/das/request?input=/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM
@@ -610,7 +610,7 @@ std::vector<DMCblock*> setupDMCblocks_BTag_up(){
 		//see also https://twiki.cern.ch/twiki/bin/view/CMS/B2GPHYS14 
 		//to use this you would need to get effective ngen that includes negative weights, beware; 50-100 is really >50
 		//float cs_uncert = 0;//xxx
-		//DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_BTag_up", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
+		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_BTag_up", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
 		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL50toINFf_BTag_up", 6025.2 , 228.5, 19259107, {{"Mlow",50},{"Mhigh",99999}}, null_float_meta, null_string_meta, true, false, 13., true));
 		//nGen was 19310834, previously 12020067. But the cross section is obviously too big if you do that and DAS says 28825132. That's probably #positibe - #negative. 
 //https://cmsweb.cern.ch/das/request?input=/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM
@@ -959,7 +959,7 @@ std::vector<DMCblock*> setupDMCblocks_BTag_down(){
 		//see also https://twiki.cern.ch/twiki/bin/view/CMS/B2GPHYS14 
 		//to use this you would need to get effective ngen that includes negative weights, beware; 50-100 is really >50
 		//float cs_uncert = 0;//xxx
-		//DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_BTag_down", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
+		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_BTag_down", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
 		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL50toINFf_BTag_down", 6025.2 , 228.5, 19259107, {{"Mlow",50},{"Mhigh",99999}}, null_float_meta, null_string_meta, true, false, 13., true));
 		//nGen was 19310834, previously 12020067. But the cross section is obviously too big if you do that and DAS says 28825132. That's probably #positibe - #negative. 
 //https://cmsweb.cern.ch/das/request?input=/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM
@@ -1308,7 +1308,7 @@ std::vector<DMCblock*> setupDMCblocks_JEC_up(){
 		//see also https://twiki.cern.ch/twiki/bin/view/CMS/B2GPHYS14 
 		//to use this you would need to get effective ngen that includes negative weights, beware; 50-100 is really >50
 		//float cs_uncert = 0;//xxx
-		//DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JEC_up", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
+		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JEC_up", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
 		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL50toINFf_JEC_up", 6025.2 , 228.5, 19259107, {{"Mlow",50},{"Mhigh",99999}}, null_float_meta, null_string_meta, true, false, 13., true));
 		//nGen was 19310834, previously 12020067. But the cross section is obviously too big if you do that and DAS says 28825132. That's probably #positibe - #negative. 
 //https://cmsweb.cern.ch/das/request?input=/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM
@@ -1657,7 +1657,7 @@ std::vector<DMCblock*> setupDMCblocks_JEC_down(){
 		//see also https://twiki.cern.ch/twiki/bin/view/CMS/B2GPHYS14 
 		//to use this you would need to get effective ngen that includes negative weights, beware; 50-100 is really >50
 		//float cs_uncert = 0;//xxx
-		//DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JEC_down", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
+		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JEC_down", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
 		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL50toINFf_JEC_down", 6025.2 , 228.5, 19259107, {{"Mlow",50},{"Mhigh",99999}}, null_float_meta, null_string_meta, true, false, 13., true));
 		//nGen was 19310834, previously 12020067. But the cross section is obviously too big if you do that and DAS says 28825132. That's probably #positibe - #negative. 
 //https://cmsweb.cern.ch/das/request?input=/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM
@@ -2006,7 +2006,7 @@ std::vector<DMCblock*> setupDMCblocks_JER_up(){
 		//see also https://twiki.cern.ch/twiki/bin/view/CMS/B2GPHYS14 
 		//to use this you would need to get effective ngen that includes negative weights, beware; 50-100 is really >50
 		//float cs_uncert = 0;//xxx
-		//DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JER_up", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
+		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JER_up", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
 		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL50toINFf_JER_up", 6025.2 , 228.5, 19259107, {{"Mlow",50},{"Mhigh",99999}}, null_float_meta, null_string_meta, true, false, 13., true));
 		//nGen was 19310834, previously 12020067. But the cross section is obviously too big if you do that and DAS says 28825132. That's probably #positibe - #negative. 
 //https://cmsweb.cern.ch/das/request?input=/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM
@@ -2355,7 +2355,7 @@ std::vector<DMCblock*> setupDMCblocks_JER_down(){
 		//see also https://twiki.cern.ch/twiki/bin/view/CMS/B2GPHYS14 
 		//to use this you would need to get effective ngen that includes negative weights, beware; 50-100 is really >50
 		//float cs_uncert = 0;//xxx
-		//DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JER_down", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
+		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL10to50f_JER_down", 18610, cs_uncert, 22217467, {{"Mlow",10},{"Mhigh",50}}, null_float_meta, null_string_meta, true, false, 13., true));///xxx
 		DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_25ns.txt", type, "DYJetsToLL50toINFf_JER_down", 6025.2 , 228.5, 19259107, {{"Mlow",50},{"Mhigh",99999}}, null_float_meta, null_string_meta, true, false, 13., true));
 		//nGen was 19310834, previously 12020067. But the cross section is obviously too big if you do that and DAS says 28825132. That's probably #positibe - #negative. 
 //https://cmsweb.cern.ch/das/request?input=/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM
