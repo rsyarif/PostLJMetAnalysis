@@ -47,7 +47,7 @@ TH1F* make_ratio_uncertainty_hist(TH1F* data, TH1F* bkg);
 void fix_negatives(TH1F* hist);
 void fix_negativesX(TH2F* hist);
 void check_for_negatives(TH1F* hist);
-string MakeThetaRootFile_Yield(string varname_, histtable htable, histmap2D* histmapbkg, string dir,
+string MakeThetaRootFile_Yield(string varname_, histtable htable, histmap2D* histmapbkg, histtable2D htable2D, string dir,
 								std::vector<DMCclass*> vSigClassesAll, 
 								std::vector<DMCclass*> vSigClassesUP, 
 								std::vector<DMCclass*> vSigClassesDOWN, 
@@ -69,6 +69,7 @@ float get_bZbr(float bWbr, float tHbr);
 
 void post(){
 	CMSStyle();
+	TH1::AddDirectory(kFALSE);
 	//typedef stringmap<TH1F*> histmap;
 	//typedef stringmap<histmap*> histtable;
 	//typedef stringmap<TH2F*> histmap2D;
@@ -76,6 +77,7 @@ void post(){
 	std::vector<string> SigtoInclude;
 	std::vector<string> plotnames; 
 	std::vector<string> bkgplotnames; 
+	std::vector<string> sysplotnames; // added by rizki - for s_yield 
 	LabelKinVars allkinvar_stringmap = setupAllKinematicVar(); //the entire universe of kinvars
 	stringmap<KinematicVar*> chosenkinvar_stringmap; // map from plotname to the corresponding kinvar. 
 
@@ -117,6 +119,8 @@ void post(){
 // 	    plotnames.push_back("h_ST_OSDL1sansS"); chosenkinvar_stringmap.set(plotnames.back(),allkinvar_stringmap->get_throwable("ST",1));
 // 	    plotnames.push_back("h_ST_OSDL1sansSlb"); chosenkinvar_stringmap.set(plotnames.back(),allkinvar_stringmap->get_throwable("ST",1));
 	    plotnames.push_back("h_yield"); chosenkinvar_stringmap.set(plotnames.back(),allkinvar_stringmap->get_throwable("yield",1));
+
+	    sysplotnames.push_back("s_yield"); chosenkinvar_stringmap.set(sysplotnames.back(),allkinvar_stringmap->get_throwable("yield",1)); //added by rizki - for s_yield
 
 		//Special background plots to load in	
 // 	    bkgplotnames.push_back("b_ST_OSDL1sansS"); chosenkinvar_stringmap.set(bkgplotnames.back(),allkinvar_stringmap->get_throwable("ST",1));
@@ -160,6 +164,7 @@ void post(){
 
 	std::vector<DMCclass*> vClasses; //mostly a copy of vBkgClasses, but with MC and data appended. 
 	std::vector<DMCclass*> vClassesAll; //data+sig+sig_up/down+bkg+bkg_up/down
+	std::vector<DMCclass*> vClassesSys; //for pulling out s_yield in sig+bkg
 	
 	//vectorize all the classes 
 
@@ -188,6 +193,10 @@ void post(){
 	for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass< vBkgClassesDOWN.end();iclass++) vClassesAll.push_back((*iclass));
 	stringmap<DMCclass*>* mClassesAll =  makemap(vClassesAll);
 
+	// for pulling out s_yield - added by rizki
+	for(std::vector<DMCclass*>::iterator iclass = vSigClassesAll.begin();iclass< vSigClassesAll.end();iclass++)vClassesSys.push_back((*iclass));
+	for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass< vBkgClasses.end();iclass++)vClassesSys.push_back((*iclass));
+
 	
 	    ///////////////////////////// File Work ///////////////////////////////////////
 
@@ -208,7 +217,8 @@ void post(){
 			    cerr<<"Error! Cannot find EventLoop file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
 			    std::terminate();
 			}
-			vFiles.push_back(new TFile((*iblock)->string_meta["EventLoopOutRoot"].c_str(), "READ"));
+			vFiles.push_back(TFile::Open((*iblock)->string_meta["EventLoopOutRoot"].c_str(), "READ"));
+			//vFiles.push_back(new TFile((*iblock)->string_meta["EventLoopOutRoot"].c_str(), "READ"));
 			//if((*iclass)->name.compare(dataClassName)==0 and firstround) start_of_data_in_vFiles = vFiles.size()-1;//old note which file the data starts on.
 			if((*iclass)->int_meta["isData"]==1   and start_of_data_in_vFiles   ==-1) start_of_data_in_vFiles = vFiles.size()-1;//note which file the data starts on.
 			if((*iclass)->int_meta["isSignal"]==1 and start_of_signal_in_vFiles ==-1){
@@ -352,65 +362,151 @@ void post(){
 
 // 	    cout<<"loading for block "<<(*iblock)->name<<endl;
 	    for(std::vector<string>::iterator iplot = bkgplotnames.begin(); iplot<bkgplotnames.end();iplot++){
-		if(not vFiles[thisfile]->GetListOfKeys()->Contains((*iplot).c_str()) ){
-		    cerr<<"Error! Cannot find plot "<<*iplot<<" in file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
-		    std::terminate();
-		}
-// 		cout<<"fetching "<<*iplot<<endl;
+			if(not vFiles[thisfile]->GetListOfKeys()->Contains((*iplot).c_str()) ){
+				cerr<<"Error! Cannot find plot "<<*iplot<<" in file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
+				std::terminate();
+			}
+	// 		cout<<"fetching "<<*iplot<<endl;
 
-		TH2F* temp = (TH2F*)vFiles[thisfile]->Get((*iplot).c_str());///fix.
-		//cout<<"bkg "<<(*iblock)->name<<" plot "<<*iplot<<" first bkg bin: "<<temp->GetBinContent(1,1)<<endl;//xxx
-		TH2F* temp2;
-		if(firstround) temp2 = (TH2F*)temp->Clone((*iplot + "_ddBkg").c_str());
-		else{
-		    temp2 = (TH2F*)temp->Clone((*iplot + "_" + (*iblock)->name ).c_str());
-		    //cout<<"Try cloning under second round with "<<(*iplot) + "_" + (*iblock)->name<<endl<<flush;
-		}
+			TH2F* temp = (TH2F*)vFiles[thisfile]->Get((*iplot).c_str());///fix.
+			//cout<<"bkg "<<(*iblock)->name<<" plot "<<*iplot<<" first bkg bin: "<<temp->GetBinContent(1,1)<<endl;//xxx
+			TH2F* temp2;
+			if(firstround) temp2 = (TH2F*)temp->Clone((*iplot + "_ddBkg").c_str());
+			else{
+				temp2 = (TH2F*)temp->Clone((*iplot + "_" + (*iblock)->name ).c_str());
+				//cout<<"Try cloning under second round with "<<(*iplot) + "_" + (*iblock)->name<<endl<<flush;
+			}
 
-		AddOverflowX(temp2);
-		fix_negativesX(temp2);
-		assert(!(*iblock)->isMC);
+			AddOverflowX(temp2);
+			fix_negativesX(temp2);
+			assert(!(*iblock)->isMC);
 
-		try{
-		    KinematicVar* thiskinvar = chosenkinvar_stringmap.get_throwable(*iplot,2);
+			try{
+				KinematicVar* thiskinvar = chosenkinvar_stringmap.get_throwable(*iplot,2);
 
-		    if(thiskinvar->tag.compare("HT") == 0) temp2 = (TH2F*)temp2->RebinX(40,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("ST") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("MET") == 0) temp2 = (TH2F*)temp2->RebinX(12,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("BTm") == 0) temp2 = (TH2F*)temp2->RebinX(30,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("BTl") == 0) temp2 = (TH2F*)temp2->RebinX(30,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("MinMlb") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("Mll") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
-			else if(thiskinvar->tag.compare("Mlll") == 0) temp2 = (TH2F*)temp2->RebinX(8,(string(temp2->GetName())+"_r").c_str());	// added by rizki - IS THIS RIGHT??
-			else if(thiskinvar->tag.compare("minMll") == 0) temp2 = (TH2F*)temp2->RebinX(10,(string(temp2->GetName())+"_r").c_str()); // added by rizki - IS THIS RIGHT??
-		    else if(thiskinvar->tag.compare("LepT") == 0) temp2 = (TH2F*)temp2->RebinX(16,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("MSum") == 0) temp2 = (TH2F*)temp2->RebinX(10,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("LHT") == 0) temp2 = (TH2F*)temp2->RebinX(20,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("MSumovST") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("MtSum") == 0) temp2 = (TH2F*)temp2->RebinX(25,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("lepPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
-		    else if(thiskinvar->tag.compare("jetPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+				if(thiskinvar->tag.compare("HT") == 0) temp2 = (TH2F*)temp2->RebinX(40,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("ST") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("MET") == 0) temp2 = (TH2F*)temp2->RebinX(12,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("BTm") == 0) temp2 = (TH2F*)temp2->RebinX(30,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("BTl") == 0) temp2 = (TH2F*)temp2->RebinX(30,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("MinMlb") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("Mll") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("Mlll") == 0) temp2 = (TH2F*)temp2->RebinX(8,(string(temp2->GetName())+"_r").c_str());	// added by rizki - IS THIS RIGHT??
+				else if(thiskinvar->tag.compare("minMll") == 0) temp2 = (TH2F*)temp2->RebinX(10,(string(temp2->GetName())+"_r").c_str()); // added by rizki - IS THIS RIGHT??
+				else if(thiskinvar->tag.compare("LepT") == 0) temp2 = (TH2F*)temp2->RebinX(16,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("MSum") == 0) temp2 = (TH2F*)temp2->RebinX(10,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("LHT") == 0) temp2 = (TH2F*)temp2->RebinX(20,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("MSumovST") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("MtSum") == 0) temp2 = (TH2F*)temp2->RebinX(25,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("lepPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("jetPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
 
-		    temp2->SetTitle( thiskinvar->titles.c_str() );
-		    temp2->SetXTitle( thiskinvar->xlabels.c_str() );
-		    temp2->SetYTitle( "Events" );
+				temp2->SetTitle( thiskinvar->titles.c_str() );
+				temp2->SetXTitle( thiskinvar->xlabels.c_str() );
+				temp2->SetYTitle( "Events" );
 
-			//change the plot name index to the same index system used by everything else. 
-		    string thisbkgplotname(*iplot);//copy iplot
-		    thisbkgplotname.replace(0,1,"h");//convert to the h_form for indexing. 
-		    //cout<<"Check: iplot should be b_: "<<*iplot<<" and thisbkgplotname should be h_: "<<thisbkgplotname<<endl;
-		    assert(thisbkgplotname.compare(*iplot));
+				//change the plot name index to the same index system used by everything else. 
+				string thisbkgplotname(*iplot);//copy iplot
+				thisbkgplotname.replace(0,1,"h");//convert to the h_form for indexing. 
+				//cout<<"Check: iplot should be b_: "<<*iplot<<" and thisbkgplotname should be h_: "<<thisbkgplotname<<endl;
+				assert(thisbkgplotname.compare(*iplot));
 
-		    if(firstround) histmapbkg->set(thisbkgplotname,temp2); 
-		    else histmapbkg->get_throwable(thisbkgplotname,3)->Add(temp2); 
-		}
-		catch(std::pair <std::string,int> errorpair){
-		    cerr<<"Stringmap Error! Invalid string key "<<errorpair.first<< " sought in histmapbkg. Error code "<<errorpair.second<<endl;
-		    std::terminate();
-		}//end catch 
+				if(firstround) histmapbkg->set(thisbkgplotname,temp2); 
+				else histmapbkg->get_throwable(thisbkgplotname,3)->Add(temp2); 
+			}
+			catch(std::pair <std::string,int> errorpair){
+				cerr<<"Stringmap Error! Invalid string key "<<errorpair.first<< " sought in histmapbkg. Error code "<<errorpair.second<<endl;
+				std::terminate();
+			}//end catch 
 	    } //for ever plot in the file 
 	    firstround = false;
 	}//for every block in the class
+
+
+	// added by rizki - start - attempt to pull out s_yields
+	////////////////////////// LOAD SYSTEMATICS (s_yield) HISTOGRAMS ///////////////////////////////
+	cout<<"Start loading sys plots from files"<<endl;
+	//load histograms into histmapsys
+	TFile *f;
+	histtable2D htable2D; //[vClass name][plotname]	
+	for(std::vector<DMCclass*>::iterator iclass = vClassesSys.begin();iclass<vClassesSys.end();iclass++){ //for every dmc class. 
+		bool firstround = true; //tells if it's the first block in the iclass. 
+		histmap2D* histmapsys = new histmap2D();
+		//cout<<"loading for "<<(*iclass)->name<<endl;
+		for(std::vector<DMCblock*>::iterator iblock = (*iclass)->blocks.begin();iblock<(*iclass)->blocks.end();iblock++){ //for every block
+			if( not fileExists( (*iblock)->string_meta["EventLoopOutRoot"]) ){
+			    cerr<<"Error! Cannot find EventLoop file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
+			    std::terminate();
+			}
+			f = TFile::Open((*iblock)->string_meta["EventLoopOutRoot"].c_str(), "READ");
+			f->cd();
+
+
+		//cout<<"loading for block "<<(*iblock)->name<<endl;
+			for(std::vector<string>::iterator iplot = sysplotnames.begin(); iplot<sysplotnames.end();iplot++){
+				if(not f->GetListOfKeys()->Contains((*iplot).c_str()) ){
+					cerr<<"Error! Cannot find plot "<<*iplot<<" in file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
+					std::terminate();
+				}
+	// 		cout<<"fetching "<<*iplot<<endl;
+
+				TH2F* temp = (TH2F*)f->Get((*iplot).c_str());///fix.
+				//cout<<"bkg "<<(*iblock)->name<<" plot "<<*iplot<<" first bkg bin: "<<temp->GetBinContent(1,1)<<endl;//xxx
+				TH2F* temp2;
+				if(firstround) temp2 = (TH2F*)temp->Clone((*iplot + "_sys").c_str());
+				else{
+					temp2 = (TH2F*)temp->Clone((*iplot + "_" + (*iblock)->name ).c_str());
+					//cout<<"Try cloning under second round with "<<(*iplot) + "_" + (*iblock)->name<<endl<<flush;
+				}
+
+				AddOverflowX(temp2);
+				fix_negativesX(temp2);
+				assert(!(*iblock)->isMC);
+
+				try{
+					KinematicVar* thiskinvar = chosenkinvar_stringmap.get_throwable(*iplot,2);
+
+					if(thiskinvar->tag.compare("HT") == 0) temp2 = (TH2F*)temp2->RebinX(40,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("ST") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("MET") == 0) temp2 = (TH2F*)temp2->RebinX(12,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("BTm") == 0) temp2 = (TH2F*)temp2->RebinX(30,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("BTl") == 0) temp2 = (TH2F*)temp2->RebinX(30,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("MinMlb") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("Mll") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("Mlll") == 0) temp2 = (TH2F*)temp2->RebinX(8,(string(temp2->GetName())+"_r").c_str());	// added by rizki - IS THIS RIGHT??
+					else if(thiskinvar->tag.compare("minMll") == 0) temp2 = (TH2F*)temp2->RebinX(10,(string(temp2->GetName())+"_r").c_str()); // added by rizki - IS THIS RIGHT??
+					else if(thiskinvar->tag.compare("LepT") == 0) temp2 = (TH2F*)temp2->RebinX(16,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("MSum") == 0) temp2 = (TH2F*)temp2->RebinX(10,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("LHT") == 0) temp2 = (TH2F*)temp2->RebinX(20,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("MSumovST") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("MtSum") == 0) temp2 = (TH2F*)temp2->RebinX(25,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("lepPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("jetPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+
+					temp2->SetTitle( thiskinvar->titles.c_str() );
+					temp2->SetXTitle( thiskinvar->xlabels.c_str() );
+					temp2->SetYTitle( "Events" );
+
+					//change the plot name index to the same index system used by everything else. 
+					string thisplotname(*iplot);//copy iplot
+					thisplotname.replace(0,1,"h");//convert to the h_form for indexing. 
+					//cout<<"Check: iplot should be s_: "<<*iplot<<" and thisbkgplotname should be h_: "<<thisbkgplotname<<endl;
+					assert(thisplotname.compare(*iplot));
+
+					if(firstround) histmapsys->set(thisplotname,temp2); 
+					else histmapsys->get_throwable(thisplotname,3)->Add(temp2); 
+				}
+				catch(std::pair <std::string,int> errorpair){
+					cerr<<"Stringmap Error! Invalid string key "<<errorpair.first<< " sought in histmapbkg. Error code "<<errorpair.second<<endl;
+					std::terminate();
+				}//end catch 
+			} //for ever plot in the file 
+	    	firstround = false;
+		}//for every block in the class
+		htable2D.set((*iclass)->name,histmapsys);
+	}
+	// added by rizki - end - attempt to pull out s_yields
+
 
 	////////////////////////////////////////////////////////
 	//////////////////////// END FILEWORK //////////////////
@@ -1262,13 +1358,24 @@ void post(){
 	//undo SignalInflationFactor - added by rizki - end	
 	
 	//added by rizki - output for Theta - start
-	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL", htable,histmapbkg,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain", htable,histmapbkg,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yield", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST800B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST700B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST600B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST500B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	//ST1100B1J3MtSum50
+
 	//added by rizki - output for Theta - end
 
 	//close all the files you opened. 
 	cout<<"begin closing plot files"<<endl;
-	for(std::vector<TFile*>::iterator ifile = vFiles.begin();ifile<vFiles.end();ifile++) (*ifile)->Close(); //this should be the last line in the program.
+	for(std::vector<TFile*>::iterator ifile = vFiles.begin();ifile<vFiles.end();ifile++) delete (*ifile); //this should be the last line in the program.
+	//for(std::vector<TFile*>::iterator ifile = vFiles.begin();ifile<vFiles.end();ifile++) (*ifile)->Close(); //this should be the last line in the program.
 	cout<<"fin post.C"<<endl;
 }//end post
 
@@ -1281,15 +1388,15 @@ TH1F* extrackBkg(TH2F* bkg_hist){
 	int ny = bkg_hist->GetNbinsY();
 
         for(int i=0;i<=nx+1;i++){//for every horizontal bin, including underflow and overflow
-	    float mean = out->GetBinContent(i);
-	    float variance = 0;
-	    for(int y=2;y<=ny;y++){ //for every filled bin above the mean value slice (ny-1) bins
-		variance+=pow(bkg_hist->GetBinContent(i,y)-mean,2);	
-	    }
-	    variance/=(float)(ny-2);//probably should be ny-2 for sample stdev. 
-	    //variance/=(ny-1);//probably should be ny-2 for sample stdev. 
-	    float newerror = sqrt(variance+ pow(out->GetBinError(i),2));
-            out->SetBinError(i,newerror);
+			float mean = out->GetBinContent(i);
+			float variance = 0;
+			for(int y=2;y<=ny;y++){ //for every filled bin above the mean value slice (ny-1) bins
+				variance+=pow(bkg_hist->GetBinContent(i,y)-mean,2);	
+			}
+			variance/=(float)(ny-2);//probably should be ny-2 for sample stdev. 
+			//variance/=(ny-1);//probably should be ny-2 for sample stdev. 
+			float newerror = sqrt(variance+ pow(out->GetBinError(i),2));
+			out->SetBinError(i,newerror);
         }
 	return out;
 }//end extrackBkg
@@ -1311,41 +1418,41 @@ string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg
 	f->cd();
 
 	try{
-	//fetch data. 
-	TH1F* datahist = (TH1F*) htable.get_throwable(dataClassName,1)->get_throwable(plotname,2)->Clone((plotname+"__DATA").c_str());
-	datahist->Write(); 
+		//fetch data. 
+		TH1F* datahist = (TH1F*) htable.get_throwable(dataClassName,1)->get_throwable(plotname,2)->Clone((plotname+"__DATA").c_str());
+		datahist->Write(); 
 
-	//write all the background histograms. 
-	for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass<vBkgClasses.end();iclass++){ //for every bkg class
-	    TH1F* thisbkghist = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
-	    thisbkghist->Write();
-	}
-	for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass<vBkgClassesUP.end();iclass++){ //for every bkg class
-			//PSES = Parton Shower Eneryg Scale up
-	    TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
-	    TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__plus").c_str());
-	    thisbkghistclone->Write();
-	}
-	for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass<vBkgClassesDOWN.end();iclass++){ //for every bkg class
-			//PSES = Parton Shower Eneryg Scale down
-	    TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
-	    TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__minus").c_str());
-	    thisbkghistclone->Write();
-	}
+		//write all the background histograms. 
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass<vBkgClasses.end();iclass++){ //for every bkg class
+			TH1F* thisbkghist = (TH1F*) htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2)->Clone((plotname+"__"+(*iclass)->name).c_str());
+			thisbkghist->Write();
+		}
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesUP.begin();iclass<vBkgClassesUP.end();iclass++){ //for every bkg class
+				//PSES = Parton Shower Eneryg Scale up
+			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
+			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__plus").c_str());
+			thisbkghistclone->Write();
+		}
+		for(std::vector<DMCclass*>::iterator iclass = vBkgClassesDOWN.begin();iclass<vBkgClassesDOWN.end();iclass++){ //for every bkg class
+				//PSES = Parton Shower Eneryg Scale down
+			TH1F* thisbkghist = htable.get_throwable((*iclass)->name,1)->get_throwable(plotname,2);
+			TH1F* thisbkghistclone = (TH1F*) thisbkghist->Clone((plotname+"__"+(*iclass)->name+"__PSES__minus").c_str());
+			thisbkghistclone->Write();
+		}
 
-	//Get the ddhists
-	TH2F* ddbkgs = histmapbkg->get_throwable(plotname,3); 
+		//Get the ddhists
+		TH2F* ddbkgs = histmapbkg->get_throwable(plotname,3); 
 		//histmapbkg is indexed using the h_ name rather than the b_name
 		//This is done around the line "histmapbkg->set(thisbkgplotname,temp2);"
-	TH1F* ddbks[nmodes];
-	ddbks[0] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG").c_str());
-	ddbks[1] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__plus").c_str());
-	ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
-	ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
-	ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
-	if(draw_ddbkg){
-	    for(int i=0;i<nmodes;i++) ddbks[i]->Write();
-	}
+		TH1F* ddbks[nmodes];
+		ddbks[0] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG").c_str());
+		ddbks[1] = (TH1F*) hslice(ddbkgs,2)->Clone((plotname+"__DDBKG__passrate__plus").c_str());
+		ddbks[2] = (TH1F*) hslice(ddbkgs,3)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
+		ddbks[3] = (TH1F*) hslice(ddbkgs,4)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
+		ddbks[4] = (TH1F*) hslice(ddbkgs,5)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
+		if(draw_ddbkg){
+			for(int i=0;i<nmodes;i++) ddbks[i]->Write();
+		}		
 		
 	}//end try
 	catch(std::pair <std::string,int> errorpair){
@@ -1362,7 +1469,7 @@ string MakeThetaRootFile_Yield_nonsignal(histtable htable, histmap2D* histmapbkg
 } //end MakeThetaRootFile_Yield_nonsignal
 
 //added by rizki - start
-string MakeThetaRootFile_Yield(	string varname_, histtable htable, histmap2D* histmapbkg, string dir, 
+string MakeThetaRootFile_Yield(	string varname_, histtable htable, histmap2D* histmapbkg, histtable2D htable2D, string dir, 
 								std::vector<DMCclass*> vSigClassesAll, 
 								std::vector<DMCclass*> vSigClassesUP, 
 								std::vector<DMCclass*> vSigClassesDOWN, 
@@ -1436,13 +1543,61 @@ string MakeThetaRootFile_Yield(	string varname_, histtable htable, histmap2D* hi
 		//This is done around the line "histmapbkg->set(thisbkgplotname,temp2);"
 		TH1F* ddbks[nmodes];
 		ddbks[0] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG").c_str());
-		ddbks[1] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__plus").c_str());
-		ddbks[2] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
-		ddbks[3] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
-		ddbks[4] = (TH1F*) hslice(ddbkgs,1)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
+		ddbks[1] = (TH1F*) hslice(ddbkgs,2)->Clone((plotname+"__DDBKG__passrate__plus").c_str());
+		ddbks[2] = (TH1F*) hslice(ddbkgs,3)->Clone((plotname+"__DDBKG__passrate__minus").c_str());
+		ddbks[3] = (TH1F*) hslice(ddbkgs,4)->Clone((plotname+"__DDBKG__failrate__plus").c_str());
+		ddbks[4] = (TH1F*) hslice(ddbkgs,5)->Clone((plotname+"__DDBKG__failrate__minus").c_str());
 		if(draw_ddbkg){
 		    for(int i=0;i<nmodes;i++) ddbks[i]->Write();
 		}
+		
+		//get SYS (s_yield) - added by rizki - start
+		//right now s_yield is a special, so this exist only for varname="yield" for the moment
+		if(varname=="yield"){
+			for(std::vector<DMCclass*>::iterator iclass = vSigClassesAll.begin();iclass<vSigClassesAll.end();iclass++){ 
+				float cs_pb_ = (*iclass)->blocks[0]->cs_pb;
+				TH2F* sys = (TH2F*) htable2D.get_throwable((*iclass)->name,1)->get_throwable(plotname,3); 
+				//histmapsys is indexed using the h_ name rather than the s_name
+				//This is done around the line "histmapsys->set(thisplotname,temp2);"
+				TH1F* sys_[nSysYields];
+				sys_[0] = (TH1F*) hslice(sys,1)->Clone((plotname+"__"+(*iclass)->name+"__nominal").c_str());
+				sys_[1] = (TH1F*) hslice(sys,2)->Clone((plotname+"__"+(*iclass)->name+"__PU__plus").c_str());
+				sys_[2] = (TH1F*) hslice(sys,3)->Clone((plotname+"__"+(*iclass)->name+"__PU__minus").c_str());
+				sys_[3] = (TH1F*) hslice(sys,4)->Clone((plotname+"__"+(*iclass)->name+"__renorm__plus").c_str());
+				sys_[4] = (TH1F*) hslice(sys,5)->Clone((plotname+"__"+(*iclass)->name+"__renorm__minus").c_str());
+				sys_[5] = (TH1F*) hslice(sys,6)->Clone((plotname+"__"+(*iclass)->name+"__pdf__plus").c_str());
+				sys_[6] = (TH1F*) hslice(sys,7)->Clone((plotname+"__"+(*iclass)->name+"__pdf__minus").c_str());
+				sys_[7] = (TH1F*) hslice(sys,8)->Clone((plotname+"__"+(*iclass)->name+"__JetSF__plus").c_str());
+				sys_[8] = (TH1F*) hslice(sys,9)->Clone((plotname+"__"+(*iclass)->name+"__JetSF__minus").c_str());
+			
+				for(int i=1;i<nSysYields;i++){
+					sys_[i]->Scale(1./(cs_pb_)); //scale to 1 pb
+					sys_[i]->Write();
+				}
+			}
+			
+			for(std::vector<DMCclass*>::iterator iclass = vBkgClasses.begin();iclass<vBkgClasses.end();iclass++){ //for every bkg class
+				TH2F* sys = (TH2F*) htable2D.get_throwable((*iclass)->name,1)->get_throwable(plotname,3); 
+				//histmapsys is indexed using the h_ name rather than the s_name
+				//This is done around the line "histmapsys->set(thisplotname,temp2);"
+				TH1F* sys_[nSysYields];
+				sys_[0] = (TH1F*) hslice(sys,1)->Clone((plotname+"__"+(*iclass)->name+"__nominal").c_str());
+				sys_[1] = (TH1F*) hslice(sys,2)->Clone((plotname+"__"+(*iclass)->name+"__PU__plus").c_str());
+				sys_[2] = (TH1F*) hslice(sys,3)->Clone((plotname+"__"+(*iclass)->name+"__PU__minus").c_str());
+				sys_[3] = (TH1F*) hslice(sys,4)->Clone((plotname+"__"+(*iclass)->name+"__renorm__plus").c_str());
+				sys_[4] = (TH1F*) hslice(sys,5)->Clone((plotname+"__"+(*iclass)->name+"__renorm__minus").c_str());
+				sys_[5] = (TH1F*) hslice(sys,6)->Clone((plotname+"__"+(*iclass)->name+"__pdf__plus").c_str());
+				sys_[6] = (TH1F*) hslice(sys,7)->Clone((plotname+"__"+(*iclass)->name+"__pdf__minus").c_str());
+				sys_[7] = (TH1F*) hslice(sys,8)->Clone((plotname+"__"+(*iclass)->name+"__JetSF__plus").c_str());
+				sys_[8] = (TH1F*) hslice(sys,9)->Clone((plotname+"__"+(*iclass)->name+"__JetSF__minus").c_str());
+			
+				for(int i=1;i<nSysYields;i++){
+					sys_[i]->Write();
+				}	
+			}
+		}		
+		//get SYS (s_yield) - added by rizki - end
+
 		
 	}//end try
 	catch(std::pair <std::string,int> errorpair){
