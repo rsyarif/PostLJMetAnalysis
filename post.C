@@ -291,6 +291,7 @@ void post(){
 			} //for ever plot in the file 
 			firstround = false;
 			cout<<"end block "<<(*iblock)->name<<endl<<flush;
+			delete vFiles.back() ; //TESTINGG!! - rizki
 		}//for every block in the class
 		htable.set((*iclass)->name,temphistmap);
 	}//end for every DMCclass
@@ -355,20 +356,29 @@ void post(){
 	//load histograms into histmapbkg
 
 	bool firstround = true;
+	TFile* data_f;
 	histmap2D* histmapbkg = new histmap2D();
 	for(std::vector<DMCblock*>::iterator iblock = dataClass->blocks.begin();iblock<dataClass->blocks.end();iblock++){ //for every block
 	    int thisfile = start_of_data_in_vFiles++;
-	    vFiles[thisfile]->cd();//cd to the data files. This only works if ddbkgclass only contains dataClass.
+// 	    vFiles[thisfile]->cd();//cd to the data files. This only works if ddbkgclass only contains dataClass.
+		if( not fileExists( (*iblock)->string_meta["EventLoopOutRoot"]) ){
+			    cerr<<"Error! Cannot find EventLoop file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
+			    std::terminate();
+		}
+		data_f = TFile::Open((*iblock)->string_meta["EventLoopOutRoot"].c_str(), "READ");
+		data_f->cd();
 
 // 	    cout<<"loading for block "<<(*iblock)->name<<endl;
 	    for(std::vector<string>::iterator iplot = bkgplotnames.begin(); iplot<bkgplotnames.end();iplot++){
-			if(not vFiles[thisfile]->GetListOfKeys()->Contains((*iplot).c_str()) ){
+// 			if(not vFiles[thisfile]->GetListOfKeys()->Contains((*iplot).c_str()) ){
+			if(not data_f->GetListOfKeys()->Contains((*iplot).c_str()) ){
 				cerr<<"Error! Cannot find plot "<<*iplot<<" in file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
 				std::terminate();
 			}
 	// 		cout<<"fetching "<<*iplot<<endl;
 
-			TH2F* temp = (TH2F*)vFiles[thisfile]->Get((*iplot).c_str());///fix.
+// 			TH2F* temp = (TH2F*)vFiles[thisfile]->Get((*iplot).c_str());///fix.
+			TH2F* temp = (TH2F*)data_f->Get((*iplot).c_str());///fix.
 			//cout<<"bkg "<<(*iblock)->name<<" plot "<<*iplot<<" first bkg bin: "<<temp->GetBinContent(1,1)<<endl;//xxx
 			TH2F* temp2;
 			if(firstround) temp2 = (TH2F*)temp->Clone((*iplot + "_ddBkg").c_str());
@@ -420,6 +430,7 @@ void post(){
 			}//end catch 
 	    } //for ever plot in the file 
 	    firstround = false;
+	    delete data_f; //TESTING!! this seems to work? -rizki
 	}//for every block in the class
 
 
@@ -427,7 +438,7 @@ void post(){
 	////////////////////////// LOAD SYSTEMATICS (s_yield) HISTOGRAMS ///////////////////////////////
 	cout<<"Start loading sys plots from files"<<endl;
 	//load histograms into histmapsys
-	TFile *f;
+	TFile *sys_f;
 	histtable2D htable2D; //[vClass name][plotname]	
 	for(std::vector<DMCclass*>::iterator iclass = vClassesSys.begin();iclass<vClassesSys.end();iclass++){ //for every dmc class. 
 		bool firstround = true; //tells if it's the first block in the iclass. 
@@ -438,19 +449,19 @@ void post(){
 			    cerr<<"Error! Cannot find EventLoop file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
 			    std::terminate();
 			}
-			f = TFile::Open((*iblock)->string_meta["EventLoopOutRoot"].c_str(), "READ");
-			f->cd();
+			sys_f = TFile::Open((*iblock)->string_meta["EventLoopOutRoot"].c_str(), "READ");
+			sys_f->cd();
 
 
 		//cout<<"loading for block "<<(*iblock)->name<<endl;
 			for(std::vector<string>::iterator iplot = sysplotnames.begin(); iplot<sysplotnames.end();iplot++){
-				if(not f->GetListOfKeys()->Contains((*iplot).c_str()) ){
+				if(not sys_f->GetListOfKeys()->Contains((*iplot).c_str()) ){
 					cerr<<"Error! Cannot find plot "<<*iplot<<" in file "<<(*iblock)->string_meta["EventLoopOutRoot"]<< " for DMCblock "<<(*iblock)->name<<endl;
 					std::terminate();
 				}
 	// 		cout<<"fetching "<<*iplot<<endl;
 
-				TH2F* temp = (TH2F*)f->Get((*iplot).c_str());///fix.
+				TH2F* temp = (TH2F*)sys_f->Get((*iplot).c_str());///fix.
 				//cout<<"bkg "<<(*iblock)->name<<" plot "<<*iplot<<" first bkg bin: "<<temp->GetBinContent(1,1)<<endl;//xxx
 				TH2F* temp2;
 				if(firstround) temp2 = (TH2F*)temp->Clone((*iplot + "_sys").c_str());
@@ -502,6 +513,7 @@ void post(){
 				}//end catch 
 			} //for ever plot in the file 
 	    	firstround = false;
+	    	delete sys_f; //this seems to work? - rizki
 		}//for every block in the class
 		htable2D.set((*iclass)->name,histmapsys);
 	}
@@ -1359,24 +1371,24 @@ void post(){
 	
 	//added by rizki - output for Theta - start
 	if(produceThetaOut)MakeThetaRootFile_Yield("yield", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST800B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST700B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST600B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST500B1J3MtSum50", htable,histmapbkg,histmapsys,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST800B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST700B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST600B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST500B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	//ST1100B1J3MtSum50
 
 	//added by rizki - output for Theta - end
 
 	//close all the files you opened. 
-	cout<<"begin closing plot files"<<endl;
-	for(std::vector<TFile*>::iterator ifile = vFiles.begin();ifile<vFiles.end();ifile++) delete (*ifile); //this should be the last line in the program.
+// 	cout<<"begin closing plot files"<<endl;
+// 	for(std::vector<TFile*>::iterator ifile = vFiles.begin();ifile<vFiles.end();ifile++) delete (*ifile); //this should be the last line in the program.
 	//for(std::vector<TFile*>::iterator ifile = vFiles.begin();ifile<vFiles.end();ifile++) (*ifile)->Close(); //this should be the last line in the program.
-	cout<<"fin post.C"<<endl;
+	cout<<"finish post.C"<<endl;
 }//end post
 
 TH1F* extrackBkg(TH2F* bkg_hist){
