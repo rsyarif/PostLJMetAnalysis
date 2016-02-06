@@ -400,12 +400,12 @@ std::vector<DMCblock*> setupDMCblocks(){
 
 	//https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#Triboson
 	//WWW types 150
-	//WWZ types 160  cs = 0.1651 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//WZZ types 170  cs = 0.05565 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//ZZZ types 180  cs = 0.01398 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WWZ types 160  cs = 0.1651 pb at NLO, frac_negW = 0.0571 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000*(1-2*0.0571), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WZZ types 170  cs = 0.05565 pb at NLO, frac_negW = 0.0617 (from CMS AN-2015/148) 	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000*(1-2*0.0617), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//ZZZ types 180  cs = 0.01398 pb at NLO, frac_negW = 0.0723 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/nominal/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000*(1-2*0.0723), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
 
 
 	//                       /9                          6\
@@ -752,12 +752,12 @@ std::vector<DMCblock*> setupDMCblocks_BTag_up(){
 
 	//https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#Triboson
 	//WWW types 150
-	//WWZ types 160  cs = 0.1651 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//WZZ types 170  cs = 0.05565 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//ZZZ types 180  cs = 0.01398 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WWZ types 160  cs = 0.1651 pb at NLO, frac_negW = 0.0571 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000*(1-2*0.0571), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WZZ types 170  cs = 0.05565 pb at NLO, frac_negW = 0.0617 (from CMS AN-2015/148) 	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000*(1-2*0.0617), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//ZZZ types 180  cs = 0.01398 pb at NLO, frac_negW = 0.0723 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_up/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000*(1-2*0.0723), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
 
 	//                       /9                          6\
 	//                    // |                          | \\
@@ -1104,12 +1104,12 @@ std::vector<DMCblock*> setupDMCblocks_BTag_down(){
 
 	//https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#Triboson
 	//WWW types 150
-	//WWZ types 160  cs = 0.1651 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//WZZ types 170  cs = 0.05565 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//ZZZ types 180  cs = 0.01398 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WWZ types 160  cs = 0.1651 pb at NLO, frac_negW = 0.0571 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000*(1-2*0.0571), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WZZ types 170  cs = 0.05565 pb at NLO, frac_negW = 0.0617 (from CMS AN-2015/148) 	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000*(1-2*0.0617), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//ZZZ types 180  cs = 0.01398 pb at NLO, frac_negW = 0.0723 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/BTag_down/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000*(1-2*0.0723), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
 
 	//                       /9                          6\
 	//                    // |                          | \\
@@ -1456,12 +1456,12 @@ std::vector<DMCblock*> setupDMCblocks_JEC_up(){
 
 	//https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#Triboson
 	//WWW types 150
-	//WWZ types 160  cs = 0.1651 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//WZZ types 170  cs = 0.05565 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//ZZZ types 180  cs = 0.01398 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WWZ types 160  cs = 0.1651 pb at NLO, frac_negW = 0.0571 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000*(1-2*0.0571), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WZZ types 170  cs = 0.05565 pb at NLO, frac_negW = 0.0617 (from CMS AN-2015/148) 	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000*(1-2*0.0617), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//ZZZ types 180  cs = 0.01398 pb at NLO, frac_negW = 0.0723 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_up/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000*(1-2*0.0723), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
 
 	//                       /9                          6\
 	//                    // |                          | \\
@@ -1808,12 +1808,12 @@ std::vector<DMCblock*> setupDMCblocks_JEC_down(){
 
 	//https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#Triboson
 	//WWW types 150
-	//WWZ types 160  cs = 0.1651 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//WZZ types 170  cs = 0.05565 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//ZZZ types 180  cs = 0.01398 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WWZ types 160  cs = 0.1651 pb at NLO, frac_negW = 0.0571 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000*(1-2*0.0571), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WZZ types 170  cs = 0.05565 pb at NLO, frac_negW = 0.0617 (from CMS AN-2015/148) 	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000*(1-2*0.0617), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//ZZZ types 180  cs = 0.01398 pb at NLO, frac_negW = 0.0723 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JEC_down/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000*(1-2*0.0723), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
 
 	//                       /9                          6\
 	//                    // |                          | \\
@@ -2160,12 +2160,12 @@ std::vector<DMCblock*> setupDMCblocks_JER_up(){
 
 	//https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#Triboson
 	//WWW types 150
-	//WWZ types 160  cs = 0.1651 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//WZZ types 170  cs = 0.05565 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//ZZZ types 180  cs = 0.01398 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WWZ types 160  cs = 0.1651 pb at NLO, frac_negW = 0.0571 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000*(1-2*0.0571), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WZZ types 170  cs = 0.05565 pb at NLO, frac_negW = 0.0617 (from CMS AN-2015/148) 	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000*(1-2*0.0617), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//ZZZ types 180  cs = 0.01398 pb at NLO, frac_negW = 0.0723 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_up/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000*(1-2*0.0723), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
 
 	//                       /9                          6\
 	//                    // |                          | \\
@@ -2512,12 +2512,12 @@ std::vector<DMCblock*> setupDMCblocks_JER_down(){
 
 	//https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns#Triboson
 	//WWW types 150
-	//WWZ types 160  cs = 0.1651 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//WZZ types 170  cs = 0.05565 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
-	//ZZZ types 180  cs = 0.01398 pb at NLO
-	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000, null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WWZ types 160  cs = 0.1651 pb at NLO, frac_negW = 0.0571 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 161, "WWZf", 0.1651 ,-1, 250000*(1-2*0.0571), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//WZZ types 170  cs = 0.05565 pb at NLO, frac_negW = 0.0617 (from CMS AN-2015/148) 	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt", 171, "WZZf", 0.05565 ,-1, 250000*(1-2*0.0617), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
+	//ZZZ types 180  cs = 0.01398 pb at NLO, frac_negW = 0.0723 (from CMS AN-2015/148)	// N_eff=N_gen(1-2*frac_negW)?
+	DMCblocks.push_back(new DMCblock("/uscms_data/d3/rsyarif/Spring2016/TprimeANALYSIS_copy/CMSSW_7_4_15/src/LJMet/Com/filelists/ljmetout/JER_down/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_LOCALCOPY.txt", 181, "ZZZf", 0.01398 ,-1, 250000*(1-2*0.0723), null_int_meta, null_float_meta, null_string_meta, true, false, 13., true));	
 
 	//                       /9                          6\
 	//                    // |                          | \\
