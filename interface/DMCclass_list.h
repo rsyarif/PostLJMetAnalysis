@@ -190,7 +190,7 @@ std::vector<DMCclass*> setupDMCclasses(){
 	DMCclasses.push_back(new DMCclass("WZs",vb[mb["WZs"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},true));
 	DMCclasses.push_back(new DMCclass("ZZs",vb[mb["ZZs"]],{{"FillColor",kRed+3},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},true));*/
 
-//	DMCclasses.push_back(new DMCclass("VVVf",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
+	DMCclasses.push_back(new DMCclass("VVVf",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
 //	DMCclasses.push_back(new DMCclass("VVVs",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,true)); //50ns WWW, WWZ, WZZ, ZZZ
 
 	for(std::vector<DMCclass*>::iterator iclass = DMCclasses.begin();iclass<DMCclasses.end();iclass++){
@@ -314,7 +314,7 @@ std::vector<DMCclass*> setupDMCclasses_BTag_up(){
 	DMCclasses.push_back(new DMCclass("WZs",vb[mb["WZs"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},true));
 	DMCclasses.push_back(new DMCclass("ZZs",vb[mb["ZZs"]],{{"FillColor",kRed+3},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},true));*/
 
-//	DMCclasses.push_back(new DMCclass("VVVf__BTag__plus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
+	DMCclasses.push_back(new DMCclass("VVVf__BTag__plus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
 //	DMCclasses.push_back(new DMCclass("VVVs",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,true)); //50ns WWW, WWZ, WZZ, ZZZ
 
 	for(std::vector<DMCclass*>::iterator iclass = DMCclasses.begin();iclass<DMCclasses.end();iclass++){
@@ -439,7 +439,7 @@ std::vector<DMCclass*> setupDMCclasses_BTag_down(){
 	DMCclasses.push_back(new DMCclass("WZs",vb[mb["WZs"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},true));
 	DMCclasses.push_back(new DMCclass("ZZs",vb[mb["ZZs"]],{{"FillColor",kRed+3},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},true));*/
 
-//	DMCclasses.push_back(new DMCclass("VVVf__BTag__minus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
+	DMCclasses.push_back(new DMCclass("VVVf__BTag__minus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
 //	DMCclasses.push_back(new DMCclass("VVVs",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,true)); //50ns WWW, WWZ, WZZ, ZZZ
 
 	for(std::vector<DMCclass*>::iterator iclass = DMCclasses.begin();iclass<DMCclasses.end();iclass++){
@@ -564,7 +564,7 @@ std::vector<DMCclass*> setupDMCclasses_JEC_up(){
 	DMCclasses.push_back(new DMCclass("WZs",vb[mb["WZs"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},true));
 	DMCclasses.push_back(new DMCclass("ZZs",vb[mb["ZZs"]],{{"FillColor",kRed+3},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},true));*/
 
-//	DMCclasses.push_back(new DMCclass("VVVf__JEC__plus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
+	DMCclasses.push_back(new DMCclass("VVVf__JEC__plus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
 //	DMCclasses.push_back(new DMCclass("VVVs",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,true)); //50ns WWW, WWZ, WZZ, ZZZ
 
 	for(std::vector<DMCclass*>::iterator iclass = DMCclasses.begin();iclass<DMCclasses.end();iclass++){
@@ -689,7 +689,7 @@ std::vector<DMCclass*> setupDMCclasses_JEC_down(){
 	DMCclasses.push_back(new DMCclass("WZs",vb[mb["WZs"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},true));
 	DMCclasses.push_back(new DMCclass("ZZs",vb[mb["ZZs"]],{{"FillColor",kRed+3},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},true));*/
 
-//	DMCclasses.push_back(new DMCclass("VVVf__JEC__minus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
+	DMCclasses.push_back(new DMCclass("VVVf__JEC__minus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
 //	DMCclasses.push_back(new DMCclass("VVVs",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,true)); //50ns WWW, WWZ, WZZ, ZZZ
 
 	for(std::vector<DMCclass*>::iterator iclass = DMCclasses.begin();iclass<DMCclasses.end();iclass++){
@@ -814,7 +814,7 @@ std::vector<DMCclass*> setupDMCclasses_JER_up(){
 	DMCclasses.push_back(new DMCclass("WZs",vb[mb["WZs"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},true));
 	DMCclasses.push_back(new DMCclass("ZZs",vb[mb["ZZs"]],{{"FillColor",kRed+3},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},true));*/
 
-//	DMCclasses.push_back(new DMCclass("VVVf__JER__plus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
+	DMCclasses.push_back(new DMCclass("VVVf__JER__plus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
 //	DMCclasses.push_back(new DMCclass("VVVs",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,true)); //50ns WWW, WWZ, WZZ, ZZZ
 
 	for(std::vector<DMCclass*>::iterator iclass = DMCclasses.begin();iclass<DMCclasses.end();iclass++){
@@ -939,7 +939,7 @@ std::vector<DMCclass*> setupDMCclasses_JER_down(){
 	DMCclasses.push_back(new DMCclass("WZs",vb[mb["WZs"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},true));
 	DMCclasses.push_back(new DMCclass("ZZs",vb[mb["ZZs"]],{{"FillColor",kRed+3},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},true));*/
 
-//	DMCclasses.push_back(new DMCclass("VVVf__JER__minus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
+	DMCclasses.push_back(new DMCclass("VVVf__JER__minus",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,false)); //25ns WWW, WWZ, WZZ, ZZZ
 //	DMCclasses.push_back(new DMCclass("VVVs",150, 189,vb,null_int_meta, null_float_meta, null_string_meta,true)); //50ns WWW, WWZ, WZZ, ZZZ
 
 	for(std::vector<DMCclass*>::iterator iclass = DMCclasses.begin();iclass<DMCclasses.end();iclass++){
