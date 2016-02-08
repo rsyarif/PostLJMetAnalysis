@@ -560,10 +560,10 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	for(int imu = 0; imu < (int)muEnergy_singleLepCalc->size(); ++imu){
 	    if((*muPt_singleLepCalc)[imu] < 20.) continue;
 
-	    if((*muIsLoose_singleLepCalc)[imu]){
-			nLooseMuons++;
-			LooseMuonIndicies.push_back(imu);
-		if((*muIsTight_singleLepCalc)[imu]){
+	    if((*muIsLoose_singleLepCalc)[imu] and (*muMiniIso_singleLepCalc)[imu] < 0.4){
+		nLooseMuons++;
+		LooseMuonIndicies.push_back(imu);
+		if((*muIsTight_singleLepCalc)[imu] and (*muMiniIso_singleLepCalc)[imu] < 0.2){
 		
 		    nTightMuons++;
 		    TightMuonIndicies.push_back(imu);
@@ -663,7 +663,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 		    eleIdLevel = ele_ID_level_2015_MVA_nontrig( 
 			    (*elPt_singleLepCalc)[iele],
 			    (*elEta_singleLepCalc)[iele],
-			    (*elMVAValue_singleLepCalc)[iele]);
+			    (*elMVAValue_singleLepCalc)[iele],
+			    (*elMiniIso_singleLepCalc)[iele]);
 		    break;
 		case MVA_trigger:
 		    cout<<"Error! Electron MVA selection is not yet possible"<<endl;
@@ -1708,6 +1709,13 @@ if(printlevel > 5) cout << "J" << std::endl;
 			B1 && 
 			J3 &&
 			MtSum >=50)); 
+
+	AlltopoCut->set("ST1100J3MtSum50", 
+		new topoCutDecision(is_triLepT,
+			ST>=1100 && 
+			J3 &&
+			MtSum >=50)); 
+			
 	AlltopoCut->set("ST1100B1J3MtSum50", 
 		new topoCutDecision(is_triLepT,
 			ST>=1100 && 
@@ -2212,21 +2220,21 @@ void Convert_nPolySysYields_to_nSysYields(TH2F* s_yield,TH2F* ps_yield){
 
 	//reduce the pdf entries
     for(int i=0;i<=nx+1;i++){
-	std::vector<val_err_pair*> col;
-	for(int j=next_row+nRenorm; j<nPolySysYields;++j){
-	    //transfer the column into a vector of val_err_pairs.
-	    val_err_pair *apair = new val_err_pair();
-	    apair->val = ps_yield->GetBinContent(i,j);
-	    apair->err = ps_yield->GetBinError(  i,j);
-	    col.push_back(apair);
-	}
-	std::sort( col.begin(), col.end() );
-	//after sort, smallest is in front.
-        s_yield->SetBinContent(i,next_row,col[16-1]->val); //1 sigma low 
-        s_yield->SetBinError(  i,next_row,col[16-1]->err);
+		std::vector<val_err_pair*> col;
+		for(int j=next_row+nRenorm; j<nPolySysYields;++j){
+			//transfer the column into a vector of val_err_pairs.
+			val_err_pair *apair = new val_err_pair();
+			apair->val = ps_yield->GetBinContent(i,j);
+			apair->err = ps_yield->GetBinError(  i,j);
+			col.push_back(apair);
+		}
+		std::sort( col.begin(), col.end() );
+		//after sort, smallest is in front.
+		s_yield->SetBinContent(i,next_row,col[16-1]->val); //1 sigma low 
+		s_yield->SetBinError(  i,next_row,col[16-1]->err);
 
-        s_yield->SetBinContent(i,next_row+1,col[84-1]->val);//1 sigma high
-        s_yield->SetBinError(  i,next_row+1,col[84-1]->err);
+		s_yield->SetBinContent(i,next_row+1,col[84-1]->val);//1 sigma high
+		s_yield->SetBinError(  i,next_row+1,col[84-1]->err);
     }//end for every column. 
     next_row+=2;
 

@@ -40,12 +40,13 @@ int bumpJEC = 0;//is allowed to be +- 1 and 0	//assuems 2% uncertainty.
 int bumpBtagEff = 0;//is allowed to be +- 1 and 0 
 
 	///LISTS FOR INDEXING
-const int nEventTopologies = 44; // the number of types of cuts selected, like 1JB...
+const int nEventTopologies = 45; // the number of types of cuts selected, like 1JB...
 //const int nEventTopologies = 37; // the number of types of cuts selected, like 1JB...
 //const int nEventTopologies = 24; // the number of types of cuts selected, like 1JB...
 string s_EventTopology[nEventTopologies] = {
  "NULL","main",//2
  "ST1100B1J3MtSum50","ST1000B1J3MtSum50","ST900B1J3MtSum50","ST800B1J3MtSum50","ST700B1J3MtSum50","ST600B1J3MtSum50","ST500B1J3MtSum50",//7
+ "ST1100J3MtSum50",//1
  "1J","2J","3J","4J",//4
  "HT400","HT500","HT600",//3
  "ST700","ST800","ST900","ST1000","ST1100",//5

@@ -140,9 +140,9 @@ int ele_ID_level_2015_MVA_trig(
 	float HcalRelIso,
 	float Track03RelIso);
 
-bool is_loose_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue);
-bool is_tight_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue);
-int ele_ID_level_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue);
+bool is_loose_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue, float eleMiniIso);
+bool is_tight_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue, float eleMiniIso);
+int ele_ID_level_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue, float eleMiniIso);
 
 float eleChargeMisIDRate(float eta, float pt);
 int btreeSearch(float x, std::vector<float>ranges);
@@ -491,9 +491,11 @@ bool is_veto_ele_2015(
 }//end is_veto_ele_2015
 
 
-bool is_loose_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue){
+bool is_loose_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue, float eleMiniIso){
 	//see https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2#Non_triggering_electron_MVA_deta
     //As is, this is defined only for 25ns and pt > 5 GeV
+    if(eleMiniIso > 0.4) return false;
+
     SCEta = fabs(SCEta);
     if(pt>10){
 	if(SCEta<0.8) return MVAvalue > 0.913286;
@@ -510,9 +512,11 @@ bool is_loose_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue){
     }
 }//end is_loose_ele_2015_MVA_nontrig
 
-bool is_tight_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue){
+bool is_tight_ele_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue, float eleMiniIso){
 	//see https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun2#Non_triggering_electron_MVA_deta
     //As is, this is defined only for 25ns and pt > 5 GeV
+    if(eleMiniIso > 0.1) return false;
+
     SCEta = fabs(SCEta);
     if(pt>10){
 	if(SCEta<0.8) return MVAvalue > 0.967083;
@@ -768,12 +772,12 @@ int ele_ID_level_2015(
     return ID_level;
 }//end EleIDlevel 
 
-int ele_ID_level_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue){
+int ele_ID_level_2015_MVA_nontrig( float pt, float SCEta, float MVAvalue, float eleMiniIso){
     //returns the tightest workingpoint the electron reaches. convention:  0 = junk, 1 = veto, 2 = loost, 3 = medium, 4 = tight. 
     int ID_level = 0;
-    if( is_loose_ele_2015_MVA_nontrig( pt, SCEta, MVAvalue)){
+    if( is_loose_ele_2015_MVA_nontrig( pt, SCEta, MVAvalue, eleMiniIso)){
 	ID_level = 2;
-	if(is_tight_ele_2015_MVA_nontrig( pt, SCEta, MVAvalue)) ID_level = 4;
+	if(is_tight_ele_2015_MVA_nontrig( pt, SCEta, MVAvalue, eleMiniIso)) ID_level = 4;
     }
 
     return ID_level;
