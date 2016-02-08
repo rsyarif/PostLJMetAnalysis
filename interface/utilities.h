@@ -308,7 +308,7 @@ TH1F* AddOverflow(TH1F* h){
 	float ofError = h->GetBinError(nb+1);
 
 	h->SetBinContent(nb,lastbin+overflow);
-	h->SetBinError(nb,sqrt(lbErr*lbErr + ofError+ofError)  );
+	h->SetBinError(nb,sqrt(lbErr*lbErr + ofError*ofError)  );
 	h->SetBinContent(nb+1,0.0);
 	h->SetBinError(nb+1,0.0);
 	return h;
@@ -324,7 +324,7 @@ TH2F* AddOverflow(TH2F* h){
 	    float lbErr = h->GetBinError(i,nby);
 	    float ofError = h->GetBinError(i,nby+1);
 	    h->SetBinContent(i,nby,lastbin+overflow);
-	    h->SetBinError(i,nby,sqrt(lbErr*lbErr + ofError+ofError)  );
+	    h->SetBinError(i,nby,sqrt(lbErr*lbErr + ofError*ofError)  );
 	    h->SetBinContent(i,nby+1,0.0);
 	    h->SetBinError(i,nby+1,0.0);
 	}
@@ -335,7 +335,7 @@ TH2F* AddOverflow(TH2F* h){
 	    float lbErr = h->GetBinError(nbx,j);
 	    float ofError = h->GetBinError(nbx+1,j);
 	    h->SetBinContent(nbx,j,lastbin+overflow);
-	    h->SetBinError(nbx,j,sqrt(lbErr*lbErr + ofError+ofError)  );
+	    h->SetBinError(nbx,j,sqrt(lbErr*lbErr + ofError*ofError)  );
 	    h->SetBinContent(nbx+1,j,0.0);
 	    h->SetBinError(nbx+1,j,0.0);
 	}
@@ -346,7 +346,7 @@ TH2F* AddOverflow(TH2F* h){
 	float ofError = h->GetBinError(nbx+1,nby+1);
 
 	h->SetBinContent(nbx,nby,lastbin+overflow);
-	h->SetBinError(nbx,nby,sqrt(lbErr*lbErr + ofError+ofError)  );
+	h->SetBinError(nbx,nby,sqrt(lbErr*lbErr + ofError*ofError)  );
 	h->SetBinContent(nbx+1,nby+1,0.0);
 	h->SetBinError(nbx+1,nby+1,0.0);
 	return h;
@@ -361,7 +361,7 @@ TH2F* AddOverflowX(TH2F* h){
             float lbErr = h->GetBinError(nbx,j);
             float ofError = h->GetBinError(nbx+1,j);
             h->SetBinContent(nbx,j,lastbin+overflow);
-            h->SetBinError(nbx,j,sqrt(lbErr*lbErr + ofError+ofError)  );
+            h->SetBinError(nbx,j,sqrt(lbErr*lbErr + ofError*ofError)  );
             h->SetBinContent(nbx+1,j,0.0);
             h->SetBinError(nbx+1,j,0.0);
         }
@@ -977,7 +977,7 @@ TH1F* MultiplyHists(TH1F* A, TH1F* B){
 		float a = out->GetBinContent(i);
 		float b = B->GetBinContent(i);
 		out->SetBinContent(i,a*b);
-		out->SetBinError(i,sqrt(b*out->GetBinError(i) + a*B->GetBinError(i) )   );
+		out->SetBinError(i,sqrt(pow(b*out->GetBinError(i),2) + pow(a*B->GetBinError(i),2) )   );
 	}
 	return out;
 }//end MultiplyHists;
@@ -1000,7 +1000,7 @@ TH2F* MultiplyHists(TH2F* A, TH2F* B){
 		float a = out->GetBinContent(i,j);
 		float b = B->GetBinContent(i,j);
 		out->SetBinContent(i,j,a*b);
-		out->SetBinError(i,j,sqrt(b*out->GetBinError(i,j) + a*B->GetBinError(i,j) )   );
+		out->SetBinError(i,j,sqrt(pow(b*out->GetBinError(i,j),2) + pow(a*B->GetBinError(i,j),2) )   );
 	    }
 	}
 	return out;
