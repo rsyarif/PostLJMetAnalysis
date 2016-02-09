@@ -84,7 +84,7 @@ void post(){
 	///////////////////////////// Switcehs //////////////////////////////////////
 	//Most switches are on the control pannel. 
 	bool saveImages = true;
-	bool draw_ddbkg  = false;
+	bool draw_ddbkg  = true;
 	//
 	bool makeStackPlots_lin = false;
 	bool makeStackPlots_lin_ratio = false;
@@ -464,15 +464,19 @@ void post(){
 				TH2F* temp = (TH2F*)sys_f->Get((*iplot).c_str());///fix.
 				//cout<<"bkg "<<(*iblock)->name<<" plot "<<*iplot<<" first bkg bin: "<<temp->GetBinContent(1,1)<<endl;//xxx
 				TH2F* temp2;
-				if(firstround) temp2 = (TH2F*)temp->Clone((*iplot + "_sys").c_str());
-				else{
-					temp2 = (TH2F*)temp->Clone((*iplot + "_" + (*iblock)->name ).c_str());
-					//cout<<"Try cloning under second round with "<<(*iplot) + "_" + (*iblock)->name<<endl<<flush;
-				}
+				
+				//what is this for??
+// 				if(firstround) temp2 = (TH2F*)temp->Clone((*iplot + "_" + (*iclass)->name).c_str());
+// 				else           temp2 = (TH2F*)temp->Clone((*iplot + "_" + (*iblock)->name ).c_str());
+
+				temp2 = (TH2F*)temp->Clone((*iplot + "_" + (*iblock)->name).c_str());
+
 
 				AddOverflowX(temp2);
 				fix_negativesX(temp2);
-				assert(!(*iblock)->isMC);
+
+				//need to scale same as in LOAD MAIN HISTOGRAM section
+				temp2->Scale(Integrated_Luminosity_Data*1000.0*(*iblock)->cs_pb/((*iblock)->NGenPoints));
 
 				try{
 					KinematicVar* thiskinvar = chosenkinvar_stringmap.get_throwable(*iplot,2);
@@ -855,6 +859,17 @@ void post(){
 		    gPad->RedrawAxis();
 
 			////////////////////////////////////////
+			
+			//label bins for "yield" plots - rizki - start
+			const char *yieldbins[4] = {"eee","eem","emm","mmm"};
+			if ((*iplot).find("h_yield")==0){
+				for (int i=1;i<=4;i++){
+					ratio->GetXaxis()->SetBinLabel(i,yieldbins[i-1]);
+					ratio->GetXaxis()->SetLabelSize(0.35);
+				}
+			}
+			//label bins for "yield plots - rizki - end
+			
 		    canv->cd();
 		    pad_main_for_ratio->Draw();
 		    pad_ratio->Draw("same");
@@ -1155,6 +1170,17 @@ void post(){
 		    gPad->RedrawAxis();
 
 			////////////////////////////////////////
+			
+			//label bins for "yield" plots - rizki - start
+			const char *yieldbins[4] = {"eee","eem","emm","mmm"};
+			if ((*iplot).find("h_yield")==0){
+				for (int i=1;i<=4;i++){
+					ratio->GetXaxis()->SetBinLabel(i,yieldbins[i-1]);
+					ratio->GetXaxis()->SetLabelSize(0.35);
+				}	
+			}
+			//label bins for "yield plots - rizki - end
+			
 		    canv->cd();
 		    pad_main_for_ratio->Draw();
 		    pad_ratio->Draw("same");
@@ -1373,14 +1399,36 @@ void post(){
 	if(produceThetaOut)MakeThetaRootFile_Yield("yield", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST800B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST700B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST600B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-// 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST500B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
-	//ST1100B1J3MtSum50
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST800B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST700B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST600B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST500B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100_1BmJ_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000_1BmJ_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900_1BmJ_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST800_1BmJ_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900_3J", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100_1BmJ", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000_1BmJ", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900_1BmJ", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST800", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST700", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
 
 	//added by rizki - output for Theta - end
 
@@ -1573,16 +1621,32 @@ string MakeThetaRootFile_Yield(	string varname_, histtable htable, histmap2D* hi
 				//This is done around the line "histmapsys->set(thisplotname,temp2);"
 				TH1F* sys_[nSysYields];
 				sys_[0] = (TH1F*) hslice(sys,1)->Clone((plotname+"__"+(*iclass)->name+"__nominal").c_str());
+
+				//Pileup auncertainties should be left full-value for signal.
 				sys_[1] = (TH1F*) hslice(sys,2)->Clone((plotname+"__"+(*iclass)->name+"__PU__plus").c_str());
 				sys_[2] = (TH1F*) hslice(sys,3)->Clone((plotname+"__"+(*iclass)->name+"__PU__minus").c_str());
+				
+				//Renorm and PDF uncertainties should be shape-only for signal, or else the limits will explode. 
+				//The signal MC is all leading order with extremely huge uncertainty and theta can't really handle it. 
+				//So the procedure for signal is that those uncertainty histograms get normalized: 
+				//ShiftedHist->Scale(CentralValueHist->Integral() / ShiftedHist->Integral())
+
 				sys_[3] = (TH1F*) hslice(sys,4)->Clone((plotname+"__"+(*iclass)->name+"__renorm__plus").c_str());
 				sys_[4] = (TH1F*) hslice(sys,5)->Clone((plotname+"__"+(*iclass)->name+"__renorm__minus").c_str());
 				sys_[5] = (TH1F*) hslice(sys,6)->Clone((plotname+"__"+(*iclass)->name+"__pdf__plus").c_str());
 				sys_[6] = (TH1F*) hslice(sys,7)->Clone((plotname+"__"+(*iclass)->name+"__pdf__minus").c_str());
+
+				sys_[3]->Scale(sys_[0]->Integral()/sys_[3]->Integral());
+				sys_[4]->Scale(sys_[0]->Integral()/sys_[4]->Integral());
+				sys_[5]->Scale(sys_[0]->Integral()/sys_[5]->Integral());
+				sys_[6]->Scale(sys_[0]->Integral()/sys_[6]->Integral());
+
+				//JetSF uncertainties should be left full-value for signal.
 				sys_[7] = (TH1F*) hslice(sys,8)->Clone((plotname+"__"+(*iclass)->name+"__JetSF__plus").c_str());
 				sys_[8] = (TH1F*) hslice(sys,9)->Clone((plotname+"__"+(*iclass)->name+"__JetSF__minus").c_str());
 			
-				for(int i=1;i<nSysYields;i++){
+// 				for(int i=1;i<nSysYields;i++){
+				for(int i=0;i<nSysYields;i++){
 					sys_[i]->Scale(1./(cs_pb_)); //scale to 1 pb
 					sys_[i]->Write();
 				}
