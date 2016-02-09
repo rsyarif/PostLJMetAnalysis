@@ -216,7 +216,9 @@ void DMCblock::setup(int type_){ //xxx needs work.
 	//}
 	//else if(type_ == 5){ //Fullsim MC
 	//}	
-	string_meta["EventLoopOutRoot"] = "eventloop_"+name+".root";
+	//string_meta["EventLoopOutRoot"] = "eventloop_"+name+".root";
+	string_meta["EventLoopOutRoot"] = "eventloopfiles/eventloop_"+name+".root";
+
 }//end setup
 
 
