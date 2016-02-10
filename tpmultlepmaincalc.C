@@ -1431,7 +1431,7 @@ if(printlevel > 5) cout << "E" << std::endl;
 
 			if(KinVarSwitches->get_throwable("muMiniIso",3)){
 		    	for(int imu = 0; imu<nSelMuons; ++imu){
-					MapKinVar.get_throwable("muMiniIso",4)->Fill((*muMiniIso_singleLepCalc)[selMuonIndicies[iele]] ,weight);
+					MapKinVar.get_throwable("muMiniIso",4)->Fill((*muMiniIso_singleLepCalc)[selMuonIndicies[imu]] ,weight);
 				}
 			}
 			
@@ -1538,7 +1538,7 @@ if(printlevel > 5) cout << "F" << std::endl;
 
 				if(KinVarSwitches->get_throwable("muMiniIso",3)){
 					for(int imu = 0; imu<nSelMuons; ++imu){
-						FillBkg(MapKinVar.get_throwable("muMiniIso",4), (*muMiniIso_singleLepCalc)[selMuonIndicies[iele]], bkgweights ,weight);
+						FillBkg(MapKinVar.get_throwable("muMiniIso",4), (*muMiniIso_singleLepCalc)[selMuonIndicies[imu]], bkgweights ,weight);
 					}
 				}
 				
