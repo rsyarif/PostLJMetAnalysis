@@ -1422,6 +1422,19 @@ if(printlevel > 5) cout << "E" << std::endl;
 					MapKinVar.get_throwable("lepEta",4)->Fill(lepEta[ilep] ,weight);
 				}
 			}
+			
+			if(KinVarSwitches->get_throwable("eleMiniIso",3)){
+		    	for(int iele = 0; iele<nSelEle; ++iele){
+					MapKinVar.get_throwable("eleMiniIso",4)->Fill((*elMiniIso_singleLepCalc)[selEleIndicies[iele]] ,weight);
+				}
+			}
+
+			if(KinVarSwitches->get_throwable("muMiniIso",3)){
+		    	for(int imu = 0; imu<nSelMuons; ++imi){
+					MapKinVar.get_throwable("muMiniIso",4)->Fill((*muMiniIso_singleLepCalc)[selMuonIndicies[iele]] ,weight);
+				}
+			}
+			
 		    if(KinVarSwitches->get_throwable("lepDPhi",3)){
 				MapKinVar.get_throwable("lepDPhi",4)->Fill(lepDPhi12 ,weight);
 				MapKinVar.get_throwable("lepDPhi",4)->Fill(lepDPhi23 ,weight);
@@ -1440,11 +1453,11 @@ if(printlevel > 5) cout << "E" << std::endl;
 			}
 		    if(KinVarSwitches->get_throwable("jetPt",3)) 
 			for(int ijet = 0;ijet<nJetAK4; ++ijet)
-			    MapKinVar.get_throwable("jetPt",4)->Fill((*AK4JetPt_singleLepCalc)[ijet] ,weight);
+			    MapKinVar.get_throwable("jetPt",4)->Fill((*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]] ,weight); //only want jet that pass right??
 
 		    if(KinVarSwitches->get_throwable("jetEta",3)) 
 			for(int ijet = 0;ijet<nJetAK4; ++ijet)
-			    MapKinVar.get_throwable("jetEta",4)->Fill((*AK4JetEta_singleLepCalc)[ijet] ,weight);
+			    MapKinVar.get_throwable("jetEta",4)->Fill((*AK4JetEta_singleLepCalc)[JetAK4Indicies[ijet]] ,weight); //only want jet that pass, right??
 
 		    if(KinVarSwitches->get_throwable("leadjetDR",3)) MapKinVar.get_throwable("leadjetDR",4)->Fill(leadjetDR ,weight);
 		    if(KinVarSwitches->get_throwable("leadBjetDR",3)) MapKinVar.get_throwable("leadBjetDR",4)->Fill(leadBjetDR ,weight);
@@ -1516,6 +1529,19 @@ if(printlevel > 5) cout << "F" << std::endl;
 						FillBkg(MapKinVar.get_throwable("lepEta",4), lepEta[ilep], bkgweights, weight);
 					}
 				}
+				
+				if(KinVarSwitches->get_throwable("eleMiniIso",3)){
+					for(int iele = 0; iele<nSelEle; ++iele){
+						FillBkg(MapKinVar.get_throwable("eleMiniIso",4), (*elMiniIso_singleLepCalc)[selEleIndicies[iele]], bkgweights, weight);
+					}
+				}
+
+				if(KinVarSwitches->get_throwable("muMiniIso",3)){
+					for(int imu = 0; imu<nSelMuons; ++imi){
+						FillBkg(MapKinVar.get_throwable("muMiniIso",4), (*muMiniIso_singleLepCalc)[selMuonIndicies[iele]], bkgweights ,weight);
+					}
+				}
+				
 				if(KinVarSwitches->get_throwable("lepDPhi",3)) {
 					FillBkg(MapKinVar.get_throwable("lepDPhi",4),lepDPhi12 , bkgweights, weight);
 					FillBkg(MapKinVar.get_throwable("lepDPhi",4),lepDPhi23 , bkgweights, weight);
@@ -1534,11 +1560,11 @@ if(printlevel > 5) cout << "F" << std::endl;
 				}				
 				if(KinVarSwitches->get_throwable("jetPt",3)) 
 					for(int ijet = 0;ijet<nJetAK4; ++ijet)
-					FillBkg(MapKinVar.get_throwable("jetPt",4),(*AK4JetPt_singleLepCalc)[ijet] , bkgweights, weight);
+					FillBkg(MapKinVar.get_throwable("jetPt",4),(*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]] , bkgweights, weight); //only want jet that pass, right??
 
 				if(KinVarSwitches->get_throwable("jetEta",3)) 
 					for(int ijet = 0;ijet<nJetAK4; ++ijet)
-					FillBkg(MapKinVar.get_throwable("jetEta",4),(*AK4JetEta_singleLepCalc)[ijet] , bkgweights, weight);
+					FillBkg(MapKinVar.get_throwable("jetEta",4),(*AK4JetEta_singleLepCalc)[JetAK4Indicies[ijet]] , bkgweights, weight); //only want jet that pass, right??
 
 				if(KinVarSwitches->get_throwable("leadjetDR",3)) FillBkg(MapKinVar.get_throwable("leadjetDR",4),leadjetDR , bkgweights, weight);
 				if(KinVarSwitches->get_throwable("leadBjetDR",3)) FillBkg(MapKinVar.get_throwable("leadBjetDR",4),leadBjetDR , bkgweights, weight);

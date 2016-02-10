@@ -66,20 +66,22 @@ string s_EventTopology[nEventTopologies] = {
  };
 
 
-const int nKinemVars_all = 26;
+const int nKinemVars_all = 25;
 string s_KinemVars_all[nKinemVars_all]={
-				"nBl", "nJ",
+				"nJ",//"nBl", 
                 "nBm", //"BTm", "BTl",
                 "LHT", "HT", "ST",
                 "LepT", //"EleTT", "MuT",
-                "MET", "Mlll", "Mll","minMll", "MinMlb",
-				"lepPt","lepEta","lepDPhi","minLepDPhi", "lepDR","minLepDR",
+                "MET", "Mlll", "Mll","minMll", //"MinMlb",
+				"lepPt","lepEta","lepDPhi","minLepDPhi", 
+				"lepDR","minLepDR",
 				"jetPt","jetEta","leadjetDR",
-				"leadBjetDR", "lepJetDR",
-                //"yield", "yieldsum"};
+				"lepJetDR",//"leadBjetDR", 
+				"MSum", "MtSum",
+				"eleMiniIso","muMiniIso",
+                "yield", //"yieldsum"};
 				//"BLovHT", "BMovHT", "LepTovHT", 
 				//"HTovST", "LepTovST", "METovST", "MSumovST", 
-				"MSum", "MtSum","yield"
 				};
 				//nJ
 				//Ask for JetPtThreshl
