@@ -125,7 +125,7 @@ LabelKinVars setupAllKinematicVar(){
 	//not covered:
 	//int nbins_rebin; Double_t *CustomReBinning;
 	//SetRebinning
-        //allKinVars->set("MET", new KinematicVar("MET","Missing Transverse Energy","#slash{E}_{T} (GeV)",false, 60, 0.f, 300));
+    //allKinVars->set("MET", new KinematicVar("MET","Missing Transverse Energy","#slash{E}_{T} (GeV)",false, 60, 0.f, 300));
 	/*{ KinematicVar* temp = new KinematicVar("ST","Scalar Sum of all Calorimeter Energy","#SigmaE_{E}_{T} (GeV)",true,7);
 		Double_t a[] = {0,100,200,300,400,600,800,1000};//remember nbins is #items in a[] -1
 		temp->usearray(a);
@@ -133,57 +133,67 @@ LabelKinVars setupAllKinematicVar(){
 		allKinVars->set("ST", temp); }*/
 
 	//KinematicVar(_tag, _titles, _xlabels,false, _nbins, min, max, _nRebins)
-        allKinVars->set("MET", new KinematicVar("MET","Missing Transverse Energy","#slash{E}_{T} (GeV)",false, 240, 0.f, 600, 120));
-        allKinVars->set("nJ", new KinematicVar("nJ", "Number of Jets", "Number of Jets",false, 8, 0.f, 8));
-        allKinVars->set("nBm", new KinematicVar("nBm", "Number of B-Jets", "Number of B-Jets",false, 6, 0.f, 6));
-        allKinVars->set("nBl", new KinematicVar("nBl", "Number of Loose B-Jets", "Number of Loose B-Jets",false, 6, 0.f, 6));
-        allKinVars->set("BTm", new KinematicVar("BTm","Scalar Sum of all B-jet Transverse Energy", "#SigmaB_{T} (GeV)", false, 750, 0.f, 1500.f,150));
-        allKinVars->set("BTl", new KinematicVar("BTl","Scalar Sum of all Loose B-jet Transverse Energy", "#SigmaB_{T} (GeV)", false, 750, 0.f, 1500.f,150));
-        allKinVars->set("LHT", new KinematicVar("LHT","Scalar Sum of Light Hadronic Transverse Energy", "#SigmaH_{T} (GeV)", false, 500, 0.f, 1000.f,100));
-        allKinVars->set("HT", new KinematicVar("HT","Scalar Sum of all Hadronic Transverse Energy","#SigmaH_{T} (GeV)",false, 1500, 0.f, 3000.f,200));
-        {   KinematicVar* temp = new KinematicVar("ST","Scalar Sum of All Reconstructed Transverse Energy","#SigmaE_{T} (GeV)",false,75,0.f,3000.f);
-	    Double_t a[] = {0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000, 2000, 3000}; //remember nbins is #items in a[] -1
-	    temp->SetRebinning(20,a);
-	    allKinVars->set("ST", temp);
+	allKinVars->set("MET", new KinematicVar("MET","Missing Transverse Energy","#slash{E}_{T} (GeV)",false, 240, 0.f, 600, 120));
+	allKinVars->set("nJ", new KinematicVar("nJ", "Number of Jets", "Number of Jets",false, 8, 0.f, 8));
+	allKinVars->set("nBm", new KinematicVar("nBm", "Number of B-Jets", "Number of B-Jets",false, 6, 0.f, 6));
+	allKinVars->set("nBl", new KinematicVar("nBl", "Number of Loose B-Jets", "Number of Loose B-Jets",false, 6, 0.f, 6));
+	allKinVars->set("BTm", new KinematicVar("BTm","Scalar Sum of all B-jet Transverse Energy", "#SigmaB_{T} (GeV)", false, 750, 0.f, 1500.f,150));
+	allKinVars->set("BTl", new KinematicVar("BTl","Scalar Sum of all Loose B-jet Transverse Energy", "#SigmaB_{T} (GeV)", false, 750, 0.f, 1500.f,150));
+	allKinVars->set("LHT", new KinematicVar("LHT","Scalar Sum of Light Hadronic Transverse Energy", "#SigmaH_{T} (GeV)", false, 500, 0.f, 1000.f,100));
+	allKinVars->set("HT", new KinematicVar("HT","Scalar Sum of all Hadronic Transverse Energy","#SigmaH_{T} (GeV)",false, 1500, 0.f, 3000.f,200));
+
+	{   KinematicVar* temp = new KinematicVar("ST","Scalar Sum of All Reconstructed Transverse Energy","#SigmaE_{T} (GeV)",false,75,0.f,3000.f);
+	Double_t a[] = {0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 900, 1000, 2000, 3000}; //remember nbins is #items in a[] -1
+	temp->SetRebinning(20,a);
+	allKinVars->set("ST", temp);
 	}
-        allKinVars->set("LepT", new KinematicVar("LepT","Sum Leptonic Transverse Energy", "Lep #SigmaE_{T} (GeV)", false, 400.f, 0.f, 1000.f,200));
-        allKinVars->set("EleT", new KinematicVar("EleT","Sum Electron Transverse Energy", "Ele #SigmaE_{T} (GeV)", false, 400.f, 0.f, 1000.f,200));
-        allKinVars->set("MuT", new KinematicVar("MuT","Sum Muon Transverse Energy", "Mu #SigmaE_{T} (GeV)", false, 400.f, 0.f, 1000.f,200));
-        allKinVars->set("Mlll", new KinematicVar("Mlll","Trilepton Mass","M_{lll} (GeV)",false, 100, 0, 200, 200)); //probably end up with custom rebinning here.
-        allKinVars->set("Mll", new KinematicVar("Mll","Dilepton Mass","M_{ll} (GeV)",false, 100, 0, 200, 200));
-        allKinVars->set("minMll", new KinematicVar("minMlll","Minimum Dilepton Mass","Min(M_{ll}) (GeV)",false, 100, 0, 200, 200));
 
-        {   KinematicVar* temp = new KinematicVar("MinMlb","Minimum lepton-bjet mass","Min(M_{lb}) (GeV)",false, 60, 0, 600);
-	    Double_t a[] = {0, 34, 68, 102, 136, 170, 204, 238, 300, 400, 600};
-	    temp->SetRebinning(10,a);//remember nbins is #items in a[] -1
-	    allKinVars->set("MinMlb", temp);
+	allKinVars->set("LepT", new KinematicVar("LepT","Sum Leptonic Transverse Energy", "Lep #SigmaE_{T} (GeV)", false, 400.f, 0.f, 1000.f,200));
+	allKinVars->set("EleT", new KinematicVar("EleT","Sum Electron Transverse Energy", "Ele #SigmaE_{T} (GeV)", false, 400.f, 0.f, 1000.f,200));
+	allKinVars->set("MuT", new KinematicVar("MuT","Sum Muon Transverse Energy", "Mu #SigmaE_{T} (GeV)", false, 400.f, 0.f, 1000.f,200));
+
+	allKinVars->set("Mlll", new KinematicVar("Mlll","Trilepton Mass","M_{lll} (GeV)",false, 100, 0, 200, 200)); //probably end up with custom rebinning here.
+	allKinVars->set("Mll", new KinematicVar("Mll","Dilepton Mass","M_{ll} (GeV)",false, 100, 0, 200, 200));
+	allKinVars->set("minMll", new KinematicVar("minMlll","Minimum Dilepton Mass","Min(M_{ll}) (GeV)",false, 100, 0, 200, 200));
+
+	{   KinematicVar* temp = new KinematicVar("MinMlb","Minimum lepton-bjet mass","Min(M_{lb}) (GeV)",false, 60, 0, 600);
+	Double_t a[] = {0, 34, 68, 102, 136, 170, 204, 238, 300, 400, 600};
+	temp->SetRebinning(10,a);//remember nbins is #items in a[] -1
+	allKinVars->set("MinMlb", temp);
 	}
-        allKinVars->set("yield", new KinematicVar("yield","Yields in Various Channels","Channel",false, 4, 0, 4, 1));
-        allKinVars->set("yieldsum", new KinematicVar("yieldsum","Yields in Various Channels","Channel",false, 12, 0, 12, 1));
 
-        allKinVars->set("BLovHT", new KinematicVar("BLovHT","BT loose over HT","B_{T}^{loose} / H_{T}",false, 100, 0.0, 1.0, 2)); 
-        allKinVars->set("BMovHT", new KinematicVar("BMovHT","BT medium over HT","B_{T}^{medium} / H_{T}",false, 100, 0.0, 1.0, 2)); 
-        allKinVars->set("HTovST", new KinematicVar("HTovST","HT over ST","H_{T} / S_{T}",false, 100, 0.0, 1.0, 2)); 
-        allKinVars->set("LepTovST", new KinematicVar("LepTovST","LepT over ST","Lep_{T} / S_{T}",false, 100, 0.0, 1.0, 2)); 
-        allKinVars->set("METovST", new KinematicVar("METovST","#slash{E}_{T} over ST","#slash{E}_{T} / S_{T}",false, 100, 0.0, 1.0, 2)); 
+	allKinVars->set("yield", new KinematicVar("yield","Yields in Various Channels","Channel",false, 4, 0, 4, 1));
+	allKinVars->set("yieldsum", new KinematicVar("yieldsum","Yields in Various Channels","Channel",false, 12, 0, 12, 1));
 
-        allKinVars->set("LepTovHT", new KinematicVar("LepTovHT","LepT over HT","Lep_{T} / H_{T}",false, 100, 0.0, 1.5, 2)); 
-        allKinVars->set("MSumovST", new KinematicVar("MSumovST","MSum over ST","M_{#Sigma} / S_{T}",false, 100, 0.0, 1.5, 2)); 
-        
-        allKinVars->set("MSum", new KinematicVar("MSum","Total Vector Mass of all Reconstructed Jets and Leptons","M_{#Sigma} (GeV)",false, 1000, 0.f, 2000.f,200));
-        allKinVars->set("MtSum", new KinematicVar("MtSum","Transverse Mass of Total Reconstructed Vector and #slash{E}_{T}","Mt(V_{#Sigma},#slash{E}_{T}) (GeV)",false, 1000, 0.f, 2000.f,200));
+	allKinVars->set("BLovHT", new KinematicVar("BLovHT","BT loose over HT","B_{T}^{loose} / H_{T}",false, 100, 0.0, 1.0, 2)); 
+	allKinVars->set("BMovHT", new KinematicVar("BMovHT","BT medium over HT","B_{T}^{medium} / H_{T}",false, 100, 0.0, 1.0, 2)); 
+	allKinVars->set("HTovST", new KinematicVar("HTovST","HT over ST","H_{T} / S_{T}",false, 100, 0.0, 1.0, 2)); 
+	allKinVars->set("LepTovST", new KinematicVar("LepTovST","LepT over ST","Lep_{T} / S_{T}",false, 100, 0.0, 1.0, 2)); 
+	allKinVars->set("METovST", new KinematicVar("METovST","#slash{E}_{T} over ST","#slash{E}_{T} / S_{T}",false, 100, 0.0, 1.0, 2)); 
+
+	allKinVars->set("LepTovHT", new KinematicVar("LepTovHT","LepT over HT","Lep_{T} / H_{T}",false, 100, 0.0, 1.5, 2)); 
+	allKinVars->set("MSumovST", new KinematicVar("MSumovST","MSum over ST","M_{#Sigma} / S_{T}",false, 100, 0.0, 1.5, 2)); 
+	
+	allKinVars->set("MSum", new KinematicVar("MSum","Total Vector Mass of all Reconstructed Jets and Leptons","M_{#Sigma} (GeV)",false, 1000, 0.f, 2000.f,200));
+	allKinVars->set("MtSum", new KinematicVar("MtSum","Transverse Mass of Total Reconstructed Vector and #slash{E}_{T}","Mt(V_{#Sigma},#slash{E}_{T}) (GeV)",false, 1000, 0.f, 2000.f,200));
 
 	allKinVars->set("lepPt", new KinematicVar("lepPt","Lepton P_{T}","P_{T} (GeV)",false,240,0,960,2));
 	allKinVars->set("jetPt", new KinematicVar("jetPt","Jet P_{T} (GeV)","P_{T} (GeV)",false,240,0,960,2));
+
 	allKinVars->set("lepEta", new KinematicVar("lepEta","Lepton |#eta|","|#eta|",false, 24, 0, 3.5,2));
 	allKinVars->set("jetEta", new KinematicVar("jetEta","Jet |#eta|","|#eta|",false, 24, 0, 3.5,2));
+
 	allKinVars->set("lepDPhi", new KinematicVar("lepDPhi","","",false, 30, 0, 3.14159,2));
 	allKinVars->set("minLepDPhi", new KinematicVar("minLepDPhi","","",false, 30, 0, 3.14159,2));
+
 	allKinVars->set("lepDR", new KinematicVar("lepDR","Lepton dR","dR",false,120,0,8,2));
 	allKinVars->set("minLepDR", new KinematicVar("minLepDR","Minimum Lepton dR","dR",false,120,0,8,2));
 	allKinVars->set("leadjetDR", new KinematicVar("leadjetDR","dR between the two leading Jets","dR",false,120,0,8,2));
 	allKinVars->set("leadBjetDR", new KinematicVar("leadBjetDR","dR between the leading two B-jets","dR",false,120,0,8,2));
 	allKinVars->set("lepJetDR", new KinematicVar("lepJetDR","dR between leptons and the nearest jet","dR",false,120,0,8,2));
+
+	allKinVars->set("eleMiniIso", new KinematicVar("eleMiniIso","electron miniIsolation","e miniIsolation",false,100,0,0.5,1));
+	allKinVars->set("muMiniIso", new KinematicVar("muMiniIso","muon miniIsolation","#mu miniIsolation",false,100,0,0.5,1));
 
 	return allKinVars;
 }//end setupAllKinematicVar
