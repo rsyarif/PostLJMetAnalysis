@@ -1227,8 +1227,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	std::vector<double> pdf;                                                                                                                                                                 
 	//this gives a compiler warning because I'm using passing it two pointers which are effectively return values. 
 	if(dmcblock->isMC) doLHEweights(dmcblock, LHEWeightids_singleLepCalc, LHEWeights_singleLepCalc, &renorm, &pdf);
-	if(printlevel >= 5)cout<<"Check point 2"<< endl;
 	else{ //is data
+		if(printlevel >= 5)cout<<"Check point 2"<< endl;
 	    if(is_triLepT){
 		Fill_HLT_study(HLT_coincidience_ele, HLT_map_ele, NEleTriggers, EleTriggerIndicies, viSelTriggersEl_singleLepCalc,false);
 		Fill_HLT_study(HLT_coincidience_mu,  HLT_map_mu , NMuTriggers,  MuTriggerIndicies,  viSelTriggersMu_singleLepCalc,false);
