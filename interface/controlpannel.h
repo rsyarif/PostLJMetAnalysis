@@ -76,9 +76,9 @@ string s_EventTopology[nEventTopologies] = {
  };
 
 
-const int nKinemVars_all = 25;
+const int nKinemVars_all = 28;
 string s_KinemVars_all[nKinemVars_all]={
-				"nJ",//"nBl", 
+				"nLep","nJ",//"nBl", 
                 "nBm", //"BTm", "BTl",
                 "LHT", "HT", "ST",
                 "LepT", //"EleTT", "MuT",
@@ -89,6 +89,7 @@ string s_KinemVars_all[nKinemVars_all]={
 				"lepJetDR",//"leadBjetDR", 
 				"MSum", "MtSum",
 				"eleMiniIso","muMiniIso",
+				"eleMiniIso_top3","muMiniIso_top3",
                 "yield", //"yieldsum"};
 				//"BLovHT", "BMovHT", "LepTovHT", 
 				//"HTovST", "LepTovST", "METovST", "MSumovST", 

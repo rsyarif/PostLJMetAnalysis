@@ -135,6 +135,9 @@ LabelKinVars setupAllKinematicVar(){
 	//KinematicVar(_tag, _titles, _xlabels,false, _nbins, min, max, _nRebins)
 	allKinVars->set("MET", new KinematicVar("MET","Missing Transverse Energy","#slash{E}_{T} (GeV)",false, 240, 0.f, 600, 120));
 	allKinVars->set("nJ", new KinematicVar("nJ", "Number of Jets", "Number of Jets",false, 8, 0.f, 8));
+
+	allKinVars->set("nLep", new KinematicVar("nLep", "Number of Leptons", "Number of Leptons",false, 6, 2.f, 8));
+
 	allKinVars->set("nBm", new KinematicVar("nBm", "Number of B-Jets", "Number of B-Jets",false, 6, 0.f, 6));
 	allKinVars->set("nBl", new KinematicVar("nBl", "Number of Loose B-Jets", "Number of Loose B-Jets",false, 6, 0.f, 6));
 	allKinVars->set("BTm", new KinematicVar("BTm","Scalar Sum of all B-jet Transverse Energy", "#SigmaB_{T} (GeV)", false, 750, 0.f, 1500.f,150));
@@ -194,6 +197,10 @@ LabelKinVars setupAllKinematicVar(){
 
 	allKinVars->set("eleMiniIso", new KinematicVar("eleMiniIso","electron miniIsolation","e miniIsolation",false,100,0,0.5,1));
 	allKinVars->set("muMiniIso", new KinematicVar("muMiniIso","muon miniIsolation","#mu miniIsolation",false,100,0,0.5,1));
+
+	allKinVars->set("eleMiniIso_top3", new KinematicVar("eleMiniIso_top3","electron miniIsolation (of top 3 selected leptons) ","e miniIsolation (of 3 leading leptons)",false,100,0,0.5,1));
+	allKinVars->set("muMiniIso_top3", new KinematicVar("muMiniIso_top3","muon miniIsolation (of top 3 selected leptons) ","#mu miniIsolation (of 3 leading leptons",false,100,0,0.5,1));
+
 
 	return allKinVars;
 }//end setupAllKinematicVar
