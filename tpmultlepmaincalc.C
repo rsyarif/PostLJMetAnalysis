@@ -99,7 +99,20 @@ topoCutDecision tcdFALSE(false,false);//all decisions are false
 
 
 int makeYield(bool is_elelel, bool is_elelmu, bool is_elmumu, bool is_mumumu, bool main);
-void setCutBits(stringmap<topoCutDecision*>* AlltopoCut, bool is_triLepT , float met, int nJetAK4 , int nBJetAK4CISVm , float HT , float ST, float MinMlb, float Mlll, float MtSum);
+void setCutBits(stringmap<topoCutDecision*>* AlltopoCut, 
+											bool is_triLepT , 
+											float met, 
+											int nJetAK4 , 
+											int nBJetAK4CISVm , 
+											float HT , 
+											float ST, 
+											float MinMlb, 
+											float Mlll, 
+											float MtSum,
+											bool is_elelel,
+											bool is_elelmu,
+											bool is_elmumu,
+											bool is_mumumu);
 //void setCutBits(namedbool* AlltopoCut, bool is_triLepT , float met, int nJetAK4 , int nBJetAK4CISVm , float HT , float ST, float MinMlb, float Mlll);
 
 TH1F* init_TH1F_special(string label, string var, LabelKinVars &KinVars ); //cant throw  <std::string,int> errorpair
@@ -554,6 +567,16 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	int nTightMuons = 0;
 	vector<int> LooseMuonIndicies;
 	int nLooseMuons = 0;
+	
+	//NEEDS TO BE CLEANED UP? - start
+	vector<bool> isMuTight; //added by rizki
+	vector<bool> isMuLoose;  //added rizki
+	for(int imu = 0; imu<(int)muEnergy_singleLepCalc->size(); ++imu){ //added by rizki
+		isMuTight.push_back(false); //added by rizki
+		isMuLoose.push_back(false); //added by rizki			
+	}; //added by rizki
+	//NEEDS TO BE CLEANED UP? - end
+
 	//vector<int> LooseNotTightMuonIndicies;
 	//int nLooseNotTightMuons = 0;
 	//for(int imu = 0; imu < nLooseMuons_CommonCalc; ++imu)
@@ -561,21 +584,23 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	    if((*muPt_singleLepCalc)[imu] < 20.) continue;
 
 	    if((*muIsLoose_singleLepCalc)[imu] and (*muMiniIso_singleLepCalc)[imu] < 0.4){
-		nLooseMuons++;
-		LooseMuonIndicies.push_back(imu);
-		if((*muIsTight_singleLepCalc)[imu] and (*muMiniIso_singleLepCalc)[imu] < 0.2){
+			nLooseMuons++;
+			isMuLoose.at(imu) = true;
+			LooseMuonIndicies.push_back(imu);
+			if((*muIsTight_singleLepCalc)[imu] and (*muMiniIso_singleLepCalc)[imu] < 0.2){
 		
-		    nTightMuons++;
-		    TightMuonIndicies.push_back(imu);
+				nTightMuons++;
+				isMuTight.at(imu) = true;
+				TightMuonIndicies.push_back(imu);
 
-		    TLorentzVector Vmu;
-		    Vmu.SetPtEtaPhiE ( (*muPt_singleLepCalc)[imu], (*muEta_singleLepCalc)[imu], (*muPhi_singleLepCalc)[imu], (*muEnergy_singleLepCalc)[imu]); 
-		    VLep = VLep + Vmu;
-		}//end mu is tight
-		//else{
-		    //nLooseNotTightMuons++;
-		    //LooseNotTightMuonIndicies.push_back(imu); //xxx why is this commented out??? Should be using this for bkgs. 
-		//}
+				TLorentzVector Vmu;
+				Vmu.SetPtEtaPhiE ( (*muPt_singleLepCalc)[imu], (*muEta_singleLepCalc)[imu], (*muPhi_singleLepCalc)[imu], (*muEnergy_singleLepCalc)[imu]); 
+				VLep = VLep + Vmu;
+			}//end mu is tight
+			//else{
+				//nLooseNotTightMuons++;
+				//LooseNotTightMuonIndicies.push_back(imu); //xxx why is this commented out??? Should be using this for bkgs. 
+			//}
 	    }//end mu is loose
 
 	}//end muon for loop
@@ -731,7 +756,12 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
     if(!makeBkgs && (nTightMuons + nTightEle < 3) ) continue;
     else if(makeBkgs && ( nLooseMuons + nLooseEle < 3)  ) continue;
 
-	Counters.increment("Has exactly 2 leptons");
+	if(printlevel >= 5){
+		cout << "makeBKgs: " << makeBkgs <<", nTightMuons: "<< nTightMuons <<", nTightEle: "<< nTightEle << endl;
+		cout << "          " << makeBkgs <<", nLooseMuons: "<< nLooseMuons <<", nLooseEle: "<< nLooseEle << endl;
+	}
+
+	Counters.increment("Has exactly 2 leptons"); //rizki - NEED to FIX this!!!
 
 	if(!makeBkgs && !(nTightMuons + nTightEle >= 3 )) cerr<<"Error! somehow the trilepton requirement is failing!"<<endl;
 	if(makeBkgs && !(nLooseMuons + nLooseEle >= 3 )) cerr<<"Error! somehow the trilepton requirement is failing!"<<endl;
@@ -774,7 +804,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 		}
 	}
 	for(int imu = 0; imu<nSelMuons; ++imu){
-		if((*muIsTight_singleLepCalc)[selMuonIndicies[imu]]){		
+		if(isMuTight[selMuonIndicies[imu]]){		
 
 			lepPt.push_back((*muPt_singleLepCalc)[selMuonIndicies[imu]]);		
 			lepPhi.push_back((*muPhi_singleLepCalc)[selMuonIndicies[imu]]);		
@@ -784,8 +814,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 
 			selLepCharge.push_back((*muCharge_singleLepCalc)[selMuonIndicies[imu]]);
 
-			is_lepTight.push_back((*muIsTight_singleLepCalc)[selMuonIndicies[imu]]);	
-			is_lepLoose.push_back((*muIsLoose_singleLepCalc)[selMuonIndicies[imu]]);	
+			is_lepTight.push_back(isMuTight[selMuonIndicies[imu]]);	
+			is_lepLoose.push_back(isMuLoose[selMuonIndicies[imu]]);	
 
 			selLepTightIndicies.push_back(nSelLep);
 
@@ -817,7 +847,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 		}
 	}
 	for(int imu = 0; imu<nSelMuons; ++imu){
-		if((*muIsLoose_singleLepCalc)[selMuonIndicies[imu]] && !(*muIsTight_singleLepCalc)[selMuonIndicies[imu]]){		
+		if(isMuLoose[selMuonIndicies[imu]] && !isMuTight[selMuonIndicies[imu]]){		
 
 			lepPt.push_back((*muPt_singleLepCalc)[selMuonIndicies[imu]]);		
 			lepPhi.push_back((*muPhi_singleLepCalc)[selMuonIndicies[imu]]);		
@@ -827,8 +857,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 
 			selLepCharge.push_back((*muCharge_singleLepCalc)[selMuonIndicies[imu]]);
 
-			is_lepTight.push_back((*muIsTight_singleLepCalc)[selMuonIndicies[imu]]);	
-			is_lepLoose.push_back((*muIsLoose_singleLepCalc)[selMuonIndicies[imu]]);	
+			is_lepTight.push_back(isMuTight[selMuonIndicies[imu]]);	
+			is_lepLoose.push_back(isMuLoose[selMuonIndicies[imu]]);	
 
 			selLepLooseIndicies.push_back(nSelLep);
 
@@ -846,9 +876,9 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	if(printlevel >= 5){
 		cout << " After sort ==== " << endl;
 		cout << "++++ event = " << jentry << endl;
+		cout << " nSelLep = " << nSelLep << ", nSelEle = " << nSelEle << ", nSelMuons = " << nSelMuons << ", nTightEle = " << nTightEle << ", nTightMuons = " << nTightMuons << endl;
 		for(int ilep = 0; ilep<nSelLep; ++ilep){
 			cout << " lep: index =" << selLepIndicies[ilep] << ", pt =" << lepPt[selLepIndicies[ilep]] << ", ele(0)|mu(1) = " << is_lepMu[selLepIndicies[ilep]] << ", is_lepTight = " << is_lepTight[selLepIndicies[ilep]] << endl;
-			cout << " nSelLep = " << nSelLep << ", nSelEle = " << nSelEle << ", nSelMuons = " << nSelMuons << ", nTightEle = " << nTightEle << ", nTightMuons = " << nTightMuons << endl;
 		}	
 	}
 
@@ -868,6 +898,10 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	Lep_lv.push_back(Lep2);
 	Lep_lv.push_back(Lep3);
 
+	if (selLepIndicies.size()<3){ 
+		cout << "STOPP!! top 3 Selected Leptons is less than 3!! Will Seg Fault!"<< endl;
+	}
+	
 	for(int ilep = 0; ilep<3; ++ilep){ 
 		
 		if(!is_lepMu[selLepIndicies[ilep]]){
@@ -1175,7 +1209,11 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 		ST,
 		MinMlb,
 		Mlll,
-		MtSum);
+		MtSum,
+		is_elelel,
+		is_elelmu,
+		is_elmumu,
+		is_mumumu);
 
 
 	int yield = makeYield(is_elelel, is_elelmu, is_elmumu, is_mumumu,
@@ -1696,8 +1734,20 @@ if(printlevel > 5) cout << "J" << std::endl;
 	 __\/____\/____\/____\/____\/____\/____\/____\/____\/____\/__
 	 */
 
-    void setCutBits(stringmap<topoCutDecision*>* AlltopoCut, bool is_triLepT , float met, int nJetAK4 , 
-	    int nBJetAK4CISVm , float HT , float ST, float MinMlb, float Mlll, float MtSum){
+    void setCutBits(stringmap<topoCutDecision*>* AlltopoCut, 
+    											bool is_triLepT , 
+    											float met, 
+    											int nJetAK4, 
+    											int nBJetAK4CISVm , 
+    											float HT , 
+    											float ST, 
+    											float MinMlb, 
+    											float Mlll, 
+    											float MtSum,
+												bool is_elelel,
+												bool is_elelmu,
+												bool is_elmumu,
+												bool is_mumumu){
 
 // 	bool met30 = met > 30.;
 // 	bool MinMlbcut = MinMlb > 170.;
@@ -1729,12 +1779,51 @@ if(printlevel > 5) cout << "J" << std::endl;
 
 	//topoCutDecision(bool EventIsTightTightTight, bool otherReq)
 	AlltopoCut->set("NULL", new topoCutDecision(is_triLepT,true));
+
+	AlltopoCut->set("NULL_eee", new topoCutDecision(is_triLepT,is_elelel));
+	AlltopoCut->set("NULL_eem", new topoCutDecision(is_triLepT,is_elelmu));
+	AlltopoCut->set("NULL_emm", new topoCutDecision(is_triLepT,is_elmumu));
+	AlltopoCut->set("NULL_mmm", new topoCutDecision(is_triLepT,is_mumumu));
+
+
 	AlltopoCut->set("main", 
 		new topoCutDecision(is_triLepT,
 			ST>=1100 && 
 			B1 && 
 			J3 &&
 			MtSum >=50)); 
+
+
+	AlltopoCut->set("main_eee", 
+		new topoCutDecision(is_triLepT,
+			ST>=1100 && 
+			B1 && 
+			J3 &&
+			MtSum >=50 &&
+			is_elelel)); 
+	AlltopoCut->set("main_eem", 
+		new topoCutDecision(is_triLepT,
+			ST>=1100 && 
+			B1 && 
+			J3 &&
+			MtSum >=50 &&
+			is_elelmu)); 
+	AlltopoCut->set("main_emm", 
+		new topoCutDecision(is_triLepT,
+			ST>=1100 && 
+			B1 && 
+			J3 &&
+			MtSum >=50 &&
+			is_elmumu)); 
+	AlltopoCut->set("main_mmm", 
+		new topoCutDecision(is_triLepT,
+			ST>=1100 && 
+			B1 && 
+			J3 &&
+			MtSum >=50 &&
+			is_mumumu)); 
+
+
 
 	AlltopoCut->set("ST1100J3MtSum50", 
 		new topoCutDecision(is_triLepT,
@@ -2062,7 +2151,7 @@ if(printlevel > 5) cout << "J" << std::endl;
  
 	//Yield Sum and YieldSumary return the bin to be filled in the Yield and YieldSum plots, corresponding to the type of event. 
     int makeYield(bool is_elelel, bool is_elelmu, bool is_elmumu, bool is_mumumu, bool main){
-	//yield:meaning = {-1:default 0:eee 1:eem 2:emm 3:mmm 4:4orMore}
+	//yield:meaning = {-1:default 0:eee 1:eem 2:emm 3:mmm 4:}
 	int yield;
 	if(is_elelel) yield = 0;
 	else if(is_elelmu) yield = 1;

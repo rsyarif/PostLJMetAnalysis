@@ -90,7 +90,7 @@ void post(){
 	bool makeStackPlots_lin_ratio = false;
 
 	bool makeStackPlots_log = false;
-	bool makeStackPlots_log_ratio = false;
+	bool makeStackPlots_log_ratio = true;
 	
 	bool makeStackPlots_log_SBsignif = false ; //added by rizki
 	bool produceThetaOut = true;
@@ -1398,7 +1398,17 @@ void post(){
 	//added by rizki - output for Theta - start
 	if(produceThetaOut)MakeThetaRootFile_Yield("yield", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL_eee", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL_eem", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL_emm", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldNULL_mmm", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain_eee", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain_eem", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain_emm", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+	if(produceThetaOut)MakeThetaRootFile_Yield("yieldmain_mmm", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
+
 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1100B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST1000B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
 	if(produceThetaOut)MakeThetaRootFile_Yield("yieldST900B1J3MtSum50", htable,histmapbkg,htable2D,"forTheta", vSigClassesAll, vSigClassesUP, vSigClassesDOWN , SignalInflationFactor, dataClassName, vBkgClasses, vBkgClassesUP, vBkgClassesDOWN ,draw_ddbkg);
