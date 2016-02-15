@@ -1412,7 +1412,7 @@ if(printlevel > 5) cout << "E" << std::endl;
 			if(KinVarSwitches->get_throwable("yield",3)) MapKinVar.get_throwable("yield",4)->Fill(yield,weight);
 
 		    //you're using lh_unsliced, which is thing that didn't feel M_gg binning; so always use that.
-		    if(KinVarSwitches->get_throwable("nLep",3)) MapKinVar.get_throwable("nLep",4)->Fill(nSelLep,weight);
+		    if(KinVarSwitches->get_throwable("nTightLep",3)) MapKinVar.get_throwable("nTightLep",4)->Fill(selLepTightIndicies.size(),weight);
 		    if(KinVarSwitches->get_throwable("nJ",3)) MapKinVar.get_throwable("nJ",4)->Fill(nJetAK4,weight);
 		    if(KinVarSwitches->get_throwable("nBm",3)) MapKinVar.get_throwable("nBm",4)->Fill(nBJetAK4CISVm,weight);
 		    if(KinVarSwitches->get_throwable("nBl",3)) MapKinVar.get_throwable("nBl",4)->Fill(nBJetAK4CISVl,weight);
@@ -1449,7 +1449,7 @@ if(printlevel > 5) cout << "E" << std::endl;
 		    if(KinVarSwitches->get_throwable("MtSum",3)) MapKinVar.get_throwable("MtSum",4)->Fill(MtSum ,weight);
 
 		    if(KinVarSwitches->get_throwable("lepPt",3)){
-		    	for(int ilep = 0; ilep<nSelLep; ++ilep){
+		    	for(unsigned int ilep = 0; ilep<selLepTightIndicies.size(); ++ilep){
 					MapKinVar.get_throwable("lepPt",4)->Fill(lepPt[ilep] ,weight);
 					//lepPt.push_back((*elPt_singleLepCalc)[selEleIndicies[iele]]);		
 					//lepPhi.push_back((*elPhi_singleLepCalc)[selEleIndicies[iele]]);		
@@ -1457,20 +1457,20 @@ if(printlevel > 5) cout << "E" << std::endl;
 				}
 		    }
 		    if(KinVarSwitches->get_throwable("lepEta",3)){
-		    	for(int ilep = 0; ilep<nSelLep; ++ilep){
+		    	for(unsigned int ilep = 0; ilep<selLepTightIndicies.size(); ++ilep){
 					MapKinVar.get_throwable("lepEta",4)->Fill(lepEta[ilep] ,weight);
 				}
 			}
 			
 			if(KinVarSwitches->get_throwable("eleMiniIso",3)){
-		    	for(int iele = 0; iele<nSelEle; ++iele){
-					MapKinVar.get_throwable("eleMiniIso",4)->Fill((*elMiniIso_singleLepCalc)[selEleIndicies[iele]] ,weight);
+		    	for(int iele = 0; iele<nTightEle; ++iele){
+					MapKinVar.get_throwable("eleMiniIso",4)->Fill((*elMiniIso_singleLepCalc)[TightEleIndicies[iele]] ,weight);
 				}
 			}
 
 			if(KinVarSwitches->get_throwable("muMiniIso",3)){
-		    	for(int imu = 0; imu<nSelMuons; ++imu){
-					MapKinVar.get_throwable("muMiniIso",4)->Fill((*muMiniIso_singleLepCalc)[selMuonIndicies[imu]] ,weight);
+		    	for(int imu = 0; imu<nTightMuons; ++imu){
+					MapKinVar.get_throwable("muMiniIso",4)->Fill((*muMiniIso_singleLepCalc)[TightMuonIndicies[imu]] ,weight);
 				}
 			}
 
@@ -1543,7 +1543,7 @@ if(printlevel > 5) cout << "F" << std::endl;
 
 				if(KinVarSwitches->get_throwable("yield",3)) FillBkg(MapKinVar.get_throwable("yield",4),yield_bkg, bkgweights, weight);
 
-				if(KinVarSwitches->get_throwable("nLep",3)) FillBkg(MapKinVar.get_throwable("nLep",4),nSelLep, bkgweights, weight);
+				if(KinVarSwitches->get_throwable("nTightLep",3)) FillBkg(MapKinVar.get_throwable("nTightLep",4),selLepTightIndicies.size(), bkgweights, weight);
 				if(KinVarSwitches->get_throwable("nJ",3)) FillBkg(MapKinVar.get_throwable("nJ",4),nJetAK4, bkgweights, weight);
 				if(KinVarSwitches->get_throwable("nBm",3)) FillBkg(MapKinVar.get_throwable("nBm",4),nBJetAK4CISVm, bkgweights, weight);
 				if(KinVarSwitches->get_throwable("nBl",3)) FillBkg(MapKinVar.get_throwable("nBl",4),nBJetAK4CISVl, bkgweights, weight);

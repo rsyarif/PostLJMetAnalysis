@@ -78,7 +78,7 @@ string s_EventTopology[nEventTopologies] = {
 
 const int nKinemVars_all = 28;
 string s_KinemVars_all[nKinemVars_all]={
-				"nLep","nJ",//"nBl", 
+				"nTightLep","nJ",//"nBl", 
                 "nBm", //"BTm", "BTl",
                 "LHT", "HT", "ST",
                 "LepT", //"EleTT", "MuT",
