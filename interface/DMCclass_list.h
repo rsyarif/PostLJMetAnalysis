@@ -180,10 +180,10 @@ std::vector<DMCclass*> setupDMCclasses(){
 // 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
-	DMCclasses.push_back(new DMCclass("VVf",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
-//	DMCclasses.push_back(new DMCclass("WWf",vb[mb["WWf"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
-//	DMCclasses.push_back(new DMCclass("WZf",vb[mb["WZf"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
-//	DMCclasses.push_back(new DMCclass("ZZf",vb[mb["ZZf"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
+//	DMCclasses.push_back(new DMCclass("VVf",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
+	DMCclasses.push_back(new DMCclass("WWf",vb[mb["WWf"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
+	DMCclasses.push_back(new DMCclass("WZf",vb[mb["WZf"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
+	DMCclasses.push_back(new DMCclass("ZZf",vb[mb["ZZf"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
 
 /*	DMCclasses.push_back(new DMCclass("VVs",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},true)); //50ns WW, ZZ, WZ combined
 	DMCclasses.push_back(new DMCclass("WWs",vb[mb["WWs"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},true));
@@ -304,10 +304,10 @@ std::vector<DMCclass*> setupDMCclasses_BTag_up(){
 // 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof__BTag__plus",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
-	DMCclasses.push_back(new DMCclass("VVf__BTag__plus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
-//	DMCclasses.push_back(new DMCclass("WWf__BTag__plus",vb[mb["WWf_BTag_up"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
-//	DMCclasses.push_back(new DMCclass("WZf__BTag__plus",vb[mb["WZf_BTag_up"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
-//	DMCclasses.push_back(new DMCclass("ZZf__BTag__plus",vb[mb["ZZf_BTag_up"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
+//	DMCclasses.push_back(new DMCclass("VVf__BTag__plus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
+	DMCclasses.push_back(new DMCclass("WWf__BTag__plus",vb[mb["WWf_BTag_up"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
+	DMCclasses.push_back(new DMCclass("WZf__BTag__plus",vb[mb["WZf_BTag_up"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
+	DMCclasses.push_back(new DMCclass("ZZf__BTag__plus",vb[mb["ZZf_BTag_up"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
 
 /*	DMCclasses.push_back(new DMCclass("VVs",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},true)); //50ns WW, ZZ, WZ combined
 	DMCclasses.push_back(new DMCclass("WWs",vb[mb["WWs"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},true));
@@ -429,10 +429,10 @@ std::vector<DMCclass*> setupDMCclasses_BTag_down(){
 // 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof__BTag__minus",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
-	DMCclasses.push_back(new DMCclass("VVf__BTag__minus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
-//	DMCclasses.push_back(new DMCclass("WWf__BTag__minus",vb[mb["WWf_BTag_down"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
-//	DMCclasses.push_back(new DMCclass("WZf__BTag__minus",vb[mb["WZf_BTag_down"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
-//	DMCclasses.push_back(new DMCclass("ZZf__BTag__minus",vb[mb["ZZf_BTag_down"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
+//	DMCclasses.push_back(new DMCclass("VVf__BTag__minus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
+	DMCclasses.push_back(new DMCclass("WWf__BTag__minus",vb[mb["WWf_BTag_down"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
+	DMCclasses.push_back(new DMCclass("WZf__BTag__minus",vb[mb["WZf_BTag_down"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
+	DMCclasses.push_back(new DMCclass("ZZf__BTag__minus",vb[mb["ZZf_BTag_down"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
 
 /*	DMCclasses.push_back(new DMCclass("VVs",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},true)); //50ns WW, ZZ, WZ combined
 	DMCclasses.push_back(new DMCclass("WWs",vb[mb["WWs"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},true));
@@ -554,10 +554,10 @@ std::vector<DMCclass*> setupDMCclasses_JEC_up(){
 // 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof__JEC__plus",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
-	DMCclasses.push_back(new DMCclass("VVf__JEC__plus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
-//	DMCclasses.push_back(new DMCclass("WWf__JEC__plus",vb[mb["WWf_JEC_up"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
-//	DMCclasses.push_back(new DMCclass("WZf__JEC__plus",vb[mb["WZf_JEC_up"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
-//	DMCclasses.push_back(new DMCclass("ZZf__JEC__plus",vb[mb["ZZf_JEC_up"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
+//	DMCclasses.push_back(new DMCclass("VVf__JEC__plus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
+	DMCclasses.push_back(new DMCclass("WWf__JEC__plus",vb[mb["WWf_JEC_up"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
+	DMCclasses.push_back(new DMCclass("WZf__JEC__plus",vb[mb["WZf_JEC_up"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
+	DMCclasses.push_back(new DMCclass("ZZf__JEC__plus",vb[mb["ZZf_JEC_up"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
 
 /*	DMCclasses.push_back(new DMCclass("VVs",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},true)); //50ns WW, ZZ, WZ combined
 	DMCclasses.push_back(new DMCclass("WWs",vb[mb["WWs"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},true));
@@ -679,10 +679,10 @@ std::vector<DMCclass*> setupDMCclasses_JEC_down(){
 // 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof__JEC__minus",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
-	DMCclasses.push_back(new DMCclass("VVf__JEC__minus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
-//	DMCclasses.push_back(new DMCclass("WWf__JEC__minus",vb[mb["WWf_JEC_down"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
-//	DMCclasses.push_back(new DMCclass("WZf__JEC__minus",vb[mb["WZf_JEC_down"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
-//	DMCclasses.push_back(new DMCclass("ZZf__JEC__minus",vb[mb["ZZf_JEC_down"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
+//	DMCclasses.push_back(new DMCclass("VVf__JEC__minus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
+	DMCclasses.push_back(new DMCclass("WWf__JEC__minus",vb[mb["WWf_JEC_down"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
+	DMCclasses.push_back(new DMCclass("WZf__JEC__minus",vb[mb["WZf_JEC_down"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
+	DMCclasses.push_back(new DMCclass("ZZf__JEC__minus",vb[mb["ZZf_JEC_down"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
 
 /*	DMCclasses.push_back(new DMCclass("VVs",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},true)); //50ns WW, ZZ, WZ combined
 	DMCclasses.push_back(new DMCclass("WWs",vb[mb["WWs"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},true));
@@ -804,10 +804,10 @@ std::vector<DMCclass*> setupDMCclasses_JER_up(){
 // 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof__JER__plus",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
-	DMCclasses.push_back(new DMCclass("VVf__JER__plus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
-//	DMCclasses.push_back(new DMCclass("WWf__JER__plus",vb[mb["WWf_JER_up"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
-//	DMCclasses.push_back(new DMCclass("WZf__JER__plus",vb[mb["WZf_JER_up"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
-//	DMCclasses.push_back(new DMCclass("ZZf__JER__plus",vb[mb["ZZf_JER_up"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
+//	DMCclasses.push_back(new DMCclass("VVf__JER__plus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
+	DMCclasses.push_back(new DMCclass("WWf__JER__plus",vb[mb["WWf_JER_up"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
+	DMCclasses.push_back(new DMCclass("WZf__JER__plus",vb[mb["WZf_JER_up"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
+	DMCclasses.push_back(new DMCclass("ZZf__JER__plus",vb[mb["ZZf_JER_up"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
 
 /*	DMCclasses.push_back(new DMCclass("VVs",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},true)); //50ns WW, ZZ, WZ combined
 	DMCclasses.push_back(new DMCclass("WWs",vb[mb["WWs"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},true));
@@ -929,10 +929,10 @@ std::vector<DMCclass*> setupDMCclasses_JER_down(){
 // 	DMCclasses.push_back(new DMCclass("WJetToLNu_amcatnlof__JER__minus",vb[mb["WJetToLNu_amcatnlo"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 	//DMCclasses.push_back(new DMCclass("WJetToLNus",vb[mb["WJetToLNu_thingys"]],{{"FillColor",kPink-4},{"LineColor",kPink-4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WJET"}},true)); //this weird 50ns WJetToLNu_thingys
 
-	DMCclasses.push_back(new DMCclass("VVf__JER__minus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
-//	DMCclasses.push_back(new DMCclass("WWf__JER__minus",vb[mb["WWf_JER_down"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
-//	DMCclasses.push_back(new DMCclass("WZf__JER__minus",vb[mb["WZf_JER_down"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
-//	DMCclasses.push_back(new DMCclass("ZZf__JER__minus",vb[mb["ZZf_JER_down"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
+//	DMCclasses.push_back(new DMCclass("VVf__JER__minus",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},false)); //25ns WW, ZZ, WZ combined
+	DMCclasses.push_back(new DMCclass("WWf__JER__minus",vb[mb["WWf_JER_down"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},false));
+	DMCclasses.push_back(new DMCclass("WZf__JER__minus",vb[mb["WZf_JER_down"]],{{"FillColor",kRed+4},{"LineColor",kRed+4},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WZ"}},false));
+	DMCclasses.push_back(new DMCclass("ZZf__JER__minus",vb[mb["ZZf_JER_down"]],{{"FillColor",kRed+2},{"LineColor",kRed+2},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","ZZ"}},false));
 
 /*	DMCclasses.push_back(new DMCclass("VVs",121, 142,vb,{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","VV"}},true)); //50ns WW, ZZ, WZ combined
 	DMCclasses.push_back(new DMCclass("WWs",vb[mb["WWs"]],{{"FillColor",kRed-9},{"LineColor",kRed-9},{"isData",0},{"isSignal",0}}, null_float_meta, {{"LegendLabel","WW"}},true));
@@ -1014,12 +1014,12 @@ std::vector<DMCclass*> MCbkgDMCclass(bool Tis50ns_Fis25ns, bool useV){
 	    vret.push_back(mc->get_throwable("DYJetsToLLf"));
 	    vret.push_back(mc->get_throwable("QCDf"));
 	    vret.push_back(mc->get_throwable("WJetToLNuf"));
-	    if(useV)vret.push_back(mc->get_throwable("VVf"));
-	    else{
+// 	    if(useV)vret.push_back(mc->get_throwable("VVf"));
+// 	    else{
 		vret.push_back(mc->get_throwable("WWf"));
 		vret.push_back(mc->get_throwable("WZf"));
 		vret.push_back(mc->get_throwable("ZZf"));
-	    }
+// 	    }
 	    if(useV)vret.push_back(mc->get_throwable("VVVf"));
 	    else{
 	    vret.push_back(mc->get_throwable("WWZ"));
