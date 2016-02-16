@@ -606,7 +606,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	}//end muon for loop
 	selMuonIndicies = makeBkgs?LooseMuonIndicies:TightMuonIndicies;
 	nSelMuons = makeBkgs?nLooseMuons:nTightMuons;
-	indexPtSort(selMuonIndicies,nSelMuons, (*muPt_singleLepCalc));
+	indexPtSort(selMuonIndicies,    nSelMuons, (*muPt_singleLepCalc));
+	indexPtSort(TightMuonIndicies,nTightMuons, (*muPt_singleLepCalc));
 
 	for(int imu = 0; imu<nSelMuons; ++imu) MuT+= (*muPt_singleLepCalc)[selMuonIndicies[imu]];
 
@@ -743,6 +744,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	selEleIndicies = makeBkgs?LooseEleIndicies:TightEleIndicies;
 	nSelEle = makeBkgs?nLooseEle:nTightEle;
 	indexPtSort(selEleIndicies,nSelEle,  (*elPt_singleLepCalc));
+	indexPtSort(TightEleIndicies,nTightEle,  (*elPt_singleLepCalc));
 
 	for(int iele = 0; iele<nSelEle; ++iele) EleT+= (*elPt_singleLepCalc)[selEleIndicies[iele]];
 
@@ -756,9 +758,12 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
     if(!makeBkgs && (nTightMuons + nTightEle < 3) ) continue;
     else if(makeBkgs && ( nLooseMuons + nLooseEle < 3)  ) continue;
 
-	if(printlevel >= 5){
+	if(printlevel >= 3){
+		cout << "===== After trilepton cut ===== event = "<< jentry << endl;
 		cout << "makeBKgs: " << makeBkgs <<", nTightMuons: "<< nTightMuons <<", nTightEle: "<< nTightEle << endl;
 		cout << "          " << makeBkgs <<", nLooseMuons: "<< nLooseMuons <<", nLooseEle: "<< nLooseEle << endl;
+		cout << "          " << makeBkgs <<", nLooseNotTightMuons: "<< nLooseMuons-nTightMuons <<", nLooseNotTightEle: "<< nLooseEle-nTightEle << endl;
+
 	}
 
 	Counters.increment("Has exactly 2 leptons"); //rizki - NEED to FIX this!!!
@@ -769,53 +774,54 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	assert(nLooseMuons + nLooseEle >= 3); //for background 
 	//At this point, we may be running backgrounds so we cannot assert three tight leptons.
 
-	float LepT = EleT + MuT;//LepT is total Transverse energy of all leptons found. 
+	float LepT = EleT + MuT;//LepT is total Transverse energy of all (Selected!!) leptons found. 
 
-	//Combine electons+Muons=leptons then sort in pt and Tight/Loose - start
+	//Combine lists of electons and Muons into a combined list of leptons, then sort in pt and Tight/Loose - start
 
 	vector<double> lepPt,lepPhi,lepEta, lepEnergy;
 	vector<int> selLepIndicies;
 	vector<int> selLepTightIndicies;
-	vector<int> selLepLooseIndicies;
+	vector<int> selLepLooseIndicies; //this is Loose but NOT TIGHT!!!
 	vector<int> selLepCharge;
 	vector<bool> is_lepMu;
 	vector<bool> is_lepTight;
 	vector<bool> is_lepLoose;
 	int nSelLep = 0;
+	int nTightLep = nTightEle + nTightMuons;
 
 	//collect Tight leptons
-	for(int iele = 0; iele<nSelEle; ++iele){
-		if(isEleTight[selEleIndicies[iele]]){
+	for(int iele = 0; iele<nTightEle; ++iele){
+		if(isEleTight[TightEleIndicies[iele]]){
 
-			lepPt.push_back((*elPt_singleLepCalc)[selEleIndicies[iele]]);		
-			lepPhi.push_back((*elPhi_singleLepCalc)[selEleIndicies[iele]]);		
-			lepEta.push_back((*elEta_singleLepCalc)[selEleIndicies[iele]]);		
-			lepEnergy.push_back((*elEnergy_singleLepCalc)[selEleIndicies[iele]]);		
+			lepPt.push_back((*elPt_singleLepCalc)[TightEleIndicies[iele]]);		
+			lepPhi.push_back((*elPhi_singleLepCalc)[TightEleIndicies[iele]]);		
+			lepEta.push_back((*elEta_singleLepCalc)[TightEleIndicies[iele]]);		
+			lepEnergy.push_back((*elEnergy_singleLepCalc)[TightEleIndicies[iele]]);		
 			is_lepMu.push_back(0);		
 
-			selLepCharge.push_back((*elCharge_singleLepCalc)[selEleIndicies[iele]]);
+			selLepCharge.push_back((*elCharge_singleLepCalc)[TightEleIndicies[iele]]);
 
-			is_lepTight.push_back(isEleTight[selEleIndicies[iele]]);		
-			is_lepLoose.push_back(isEleLoose[selEleIndicies[iele]]);		
+			is_lepTight.push_back(isEleTight[TightEleIndicies[iele]]);		
+			is_lepLoose.push_back(isEleLoose[TightEleIndicies[iele]]);		
 
 			selLepTightIndicies.push_back(nSelLep);
 
 			nSelLep++;
 		}
 	}
-	for(int imu = 0; imu<nSelMuons; ++imu){
-		if(isMuTight[selMuonIndicies[imu]]){		
+	for(int imu = 0; imu<nTightMuons; ++imu){
+		if(isMuTight[TightMuonIndicies[imu]]){		
 
-			lepPt.push_back((*muPt_singleLepCalc)[selMuonIndicies[imu]]);		
-			lepPhi.push_back((*muPhi_singleLepCalc)[selMuonIndicies[imu]]);		
-			lepEta.push_back((*muEta_singleLepCalc)[selMuonIndicies[imu]]);		
-			lepEnergy.push_back((*muEnergy_singleLepCalc)[selMuonIndicies[imu]]);		
+			lepPt.push_back((*muPt_singleLepCalc)[TightMuonIndicies[imu]]);		
+			lepPhi.push_back((*muPhi_singleLepCalc)[TightMuonIndicies[imu]]);		
+			lepEta.push_back((*muEta_singleLepCalc)[TightMuonIndicies[imu]]);		
+			lepEnergy.push_back((*muEnergy_singleLepCalc)[TightMuonIndicies[imu]]);		
 			is_lepMu.push_back(1);		
 
-			selLepCharge.push_back((*muCharge_singleLepCalc)[selMuonIndicies[imu]]);
+			selLepCharge.push_back((*muCharge_singleLepCalc)[TightMuonIndicies[imu]]);
 
-			is_lepTight.push_back(isMuTight[selMuonIndicies[imu]]);	
-			is_lepLoose.push_back(isMuLoose[selMuonIndicies[imu]]);	
+			is_lepTight.push_back(isMuTight[TightMuonIndicies[imu]]);	
+			is_lepLoose.push_back(isMuLoose[TightMuonIndicies[imu]]);	
 
 			selLepTightIndicies.push_back(nSelLep);
 
@@ -827,38 +833,38 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	indexPtSort(selLepTightIndicies, selLepTightIndicies.size(), lepPt);	
 
 	//collect Loose (BUT NOT TIGHT) leptons
-	for(int iele = 0; iele<nSelEle; ++iele){
-		if(isEleLoose[selEleIndicies[iele]] && !isEleTight[selEleIndicies[iele]]){
+	for(int iele = 0; iele<nLooseEle; ++iele){
+		if(isEleLoose[LooseEleIndicies[iele]] && !isEleTight[LooseEleIndicies[iele]]){
 
-			lepPt.push_back((*elPt_singleLepCalc)[selEleIndicies[iele]]);		
-			lepPhi.push_back((*elPhi_singleLepCalc)[selEleIndicies[iele]]);		
-			lepEta.push_back((*elEta_singleLepCalc)[selEleIndicies[iele]]);		
-			lepEnergy.push_back((*elEnergy_singleLepCalc)[selEleIndicies[iele]]);		
+			lepPt.push_back((*elPt_singleLepCalc)[LooseEleIndicies[iele]]);		
+			lepPhi.push_back((*elPhi_singleLepCalc)[LooseEleIndicies[iele]]);		
+			lepEta.push_back((*elEta_singleLepCalc)[LooseEleIndicies[iele]]);		
+			lepEnergy.push_back((*elEnergy_singleLepCalc)[LooseEleIndicies[iele]]);		
 			is_lepMu.push_back(0);		
 
-			selLepCharge.push_back((*elCharge_singleLepCalc)[selEleIndicies[iele]]);
+			selLepCharge.push_back((*elCharge_singleLepCalc)[LooseEleIndicies[iele]]);
 
-			is_lepTight.push_back(isEleTight[selEleIndicies[iele]]);		
-			is_lepLoose.push_back(isEleLoose[selEleIndicies[iele]]);		
+			is_lepTight.push_back(isEleTight[LooseEleIndicies[iele]]);		
+			is_lepLoose.push_back(isEleLoose[LooseEleIndicies[iele]]);		
 
 			selLepLooseIndicies.push_back(nSelLep);
 
 			nSelLep++;
 		}
 	}
-	for(int imu = 0; imu<nSelMuons; ++imu){
-		if(isMuLoose[selMuonIndicies[imu]] && !isMuTight[selMuonIndicies[imu]]){		
+	for(int imu = 0; imu<nLooseMuons; ++imu){
+		if(isMuLoose[LooseMuonIndicies[imu]] && !isMuTight[LooseMuonIndicies[imu]]){		
 
-			lepPt.push_back((*muPt_singleLepCalc)[selMuonIndicies[imu]]);		
-			lepPhi.push_back((*muPhi_singleLepCalc)[selMuonIndicies[imu]]);		
-			lepEta.push_back((*muEta_singleLepCalc)[selMuonIndicies[imu]]);		
-			lepEnergy.push_back((*muEnergy_singleLepCalc)[selMuonIndicies[imu]]);		
+			lepPt.push_back((*muPt_singleLepCalc)[LooseMuonIndicies[imu]]);		
+			lepPhi.push_back((*muPhi_singleLepCalc)[LooseMuonIndicies[imu]]);		
+			lepEta.push_back((*muEta_singleLepCalc)[LooseMuonIndicies[imu]]);		
+			lepEnergy.push_back((*muEnergy_singleLepCalc)[LooseMuonIndicies[imu]]);		
 			is_lepMu.push_back(1);		
 
-			selLepCharge.push_back((*muCharge_singleLepCalc)[selMuonIndicies[imu]]);
+			selLepCharge.push_back((*muCharge_singleLepCalc)[LooseMuonIndicies[imu]]);
 
-			is_lepTight.push_back(isMuTight[selMuonIndicies[imu]]);	
-			is_lepLoose.push_back(isMuLoose[selMuonIndicies[imu]]);	
+			is_lepTight.push_back(isMuTight[LooseMuonIndicies[imu]]);	
+			is_lepLoose.push_back(isMuLoose[LooseMuonIndicies[imu]]);	
 
 			selLepLooseIndicies.push_back(nSelLep);
 
@@ -873,10 +879,9 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	selLepIndicies.insert(selLepIndicies.end(), selLepTightIndicies.begin(), selLepTightIndicies.end());
 	selLepIndicies.insert(selLepIndicies.end(), selLepLooseIndicies.begin(), selLepLooseIndicies.end());
 	
-	if(printlevel >= 5){
-		cout << " After sort ==== " << endl;
-		cout << "++++ event = " << jentry << endl;
-		cout << " nSelLep = " << nSelLep << ", nSelEle = " << nSelEle << ", nSelMuons = " << nSelMuons << ", nTightEle = " << nTightEle << ", nTightMuons = " << nTightMuons << endl;
+	if(printlevel >= 3){
+		cout << "===== After sort ===== event = "<< jentry << endl;
+		cout << " nSelLep = " << nSelLep << ", nTightLep = "<< nTightLep << ", nTightEle = " << nTightEle << ", nTightMuons = " << nTightMuons << endl;
 		for(int ilep = 0; ilep<nSelLep; ++ilep){
 			cout << " lep: index =" << selLepIndicies[ilep] << ", pt =" << lepPt[selLepIndicies[ilep]] << ", ele(0)|mu(1) = " << is_lepMu[selLepIndicies[ilep]] << ", is_lepTight = " << is_lepTight[selLepIndicies[ilep]] << endl;
 		}	
@@ -899,7 +904,8 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	Lep_lv.push_back(Lep3);
 
 	if (selLepIndicies.size()<3){ 
-		cout << "STOPP!! top 3 Selected Leptons is less than 3!! Will Seg Fault!"<< endl;
+		cout << "Error! top 3 Selected Leptons is less than 3!! Will Seg Fault!"<< endl;
+// 		std::terminate(); //stops the program. why does this stop runone being able to be compiled???
 	}
 	
 	for(int ilep = 0; ilep<3; ++ilep){ 
@@ -1095,14 +1101,14 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	    float cisv = (*AK4JetBDisc_singleLepCalc)[JetAK4Indicies[ijet]];
 
 	    //if(cisv > CISVv2L){
-	    if((*theJetBTagLoose_JetSubCalc)[ijet]==1){
+	    if((*theJetBTagLoose_JetSubCalc)[JetAK4Indicies[ijet]]==1){
 		BJetAK4CISVlIndicies.push_back(JetAK4Indicies[ijet]);
 		nBJetAK4CISVl++;
 		BTl += (*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]];
 	    }
 
 		//if(cisv > CISVv2M){
-		if((*theJetBTag_JetSubCalc)[ijet]==1){
+		if((*theJetBTag_JetSubCalc)[JetAK4Indicies[ijet]]==1){
 		    BJetAK4CISVmSimpleIndicies.push_back(JetAK4Indicies[ijet]);
 		    nBJetAK4CISVmSimple++;
 		    BTm += (*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]];
@@ -1166,7 +1172,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	float lepJetDR = -1 + 1000*nJetAK4;//-1 if no jets, some large val to start the minimization otherwise. 
 	for(int ijet = 0; ijet < nJetAK4; ijet++){
 	    TLorentzVector vJ;
-	    vJ.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+	    vJ.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]],(*AK4JetEta_singleLepCalc)[JetAK4Indicies[ijet]], (*AK4JetPhi_singleLepCalc)[JetAK4Indicies[ijet]], (*AK4JetEnergy_singleLepCalc)[JetAK4Indicies[ijet]]);
 	    lepJetDR = min(dR(vJ,Lep1), lepJetDR);
 	    lepJetDR = min(dR(vJ,Lep2), lepJetDR);
 	    lepJetDR = min(dR(vJ,Lep3), lepJetDR);
@@ -1412,7 +1418,8 @@ if(printlevel > 5) cout << "E" << std::endl;
 			if(KinVarSwitches->get_throwable("yield",3)) MapKinVar.get_throwable("yield",4)->Fill(yield,weight);
 
 		    //you're using lh_unsliced, which is thing that didn't feel M_gg binning; so always use that.
-		    if(KinVarSwitches->get_throwable("nTightLep",3)) MapKinVar.get_throwable("nTightLep",4)->Fill(selLepTightIndicies.size(),weight);
+		    if(KinVarSwitches->get_throwable("nLep",3)) MapKinVar.get_throwable("nLep",4)->Fill(nSelLep,weight);
+		    if(KinVarSwitches->get_throwable("nTightLep",3)) MapKinVar.get_throwable("nTightLep",4)->Fill(nTightLep,weight);
 		    if(KinVarSwitches->get_throwable("nJ",3)) MapKinVar.get_throwable("nJ",4)->Fill(nJetAK4,weight);
 		    if(KinVarSwitches->get_throwable("nBm",3)) MapKinVar.get_throwable("nBm",4)->Fill(nBJetAK4CISVm,weight);
 		    if(KinVarSwitches->get_throwable("nBl",3)) MapKinVar.get_throwable("nBl",4)->Fill(nBJetAK4CISVl,weight);
@@ -1449,19 +1456,25 @@ if(printlevel > 5) cout << "E" << std::endl;
 		    if(KinVarSwitches->get_throwable("MtSum",3)) MapKinVar.get_throwable("MtSum",4)->Fill(MtSum ,weight);
 
 		    if(KinVarSwitches->get_throwable("lepPt",3)){
-		    	for(unsigned int ilep = 0; ilep<selLepTightIndicies.size(); ++ilep){
-					MapKinVar.get_throwable("lepPt",4)->Fill(lepPt[ilep] ,weight);
-					//lepPt.push_back((*elPt_singleLepCalc)[selEleIndicies[iele]]);		
+		    	for(int ilep = 0; ilep<nTightEle; ++ilep){ 
+					MapKinVar.get_throwable("lepPt",4)->Fill((*elPt_singleLepCalc)[TightEleIndicies[ilep]],weight);
+				}
+		    	for(int ilep = 0; ilep<nTightMuons; ++ilep){ 
+					MapKinVar.get_throwable("lepPt",4)->Fill((*muPt_singleLepCalc)[TightMuonIndicies[ilep]],weight);
+					//(*elPt_singleLepCalc)[selEleIndicies[iele]];		
 					//lepPhi.push_back((*elPhi_singleLepCalc)[selEleIndicies[iele]]);		
 					//lepEta.push_back((*elEta_singleLepCalc)[selEleIndicies[iele]]);		
 				}
 		    }
 		    if(KinVarSwitches->get_throwable("lepEta",3)){
-		    	for(unsigned int ilep = 0; ilep<selLepTightIndicies.size(); ++ilep){
-					MapKinVar.get_throwable("lepEta",4)->Fill(lepEta[ilep] ,weight);
+		    	for(int ilep = 0; ilep<nTightEle; ++ilep){ 
+					MapKinVar.get_throwable("lepEta",4)->Fill((*elEta_singleLepCalc)[TightEleIndicies[ilep]],weight);
 				}
-			}
-			
+				for(int ilep = 0; ilep<nTightMuons; ++ilep){ 
+					MapKinVar.get_throwable("lepEta",4)->Fill((*muEta_singleLepCalc)[TightMuonIndicies[ilep]],weight);
+				}
+		    }
+		    
 			if(KinVarSwitches->get_throwable("eleMiniIso",3)){
 		    	for(int iele = 0; iele<nTightEle; ++iele){
 					MapKinVar.get_throwable("eleMiniIso",4)->Fill((*elMiniIso_singleLepCalc)[TightEleIndicies[iele]] ,weight);
@@ -1474,17 +1487,18 @@ if(printlevel > 5) cout << "E" << std::endl;
 				}
 			}
 
-			if(KinVarSwitches->get_throwable("eleMiniIso_top3",3)){
-		    	for(int iele = 0; iele<nSelEle_top3; ++iele){
-					MapKinVar.get_throwable("eleMiniIso_top3",4)->Fill((*elMiniIso_singleLepCalc)[selEleIndicies[iele]] ,weight);
-				}
-			}
-
-			if(KinVarSwitches->get_throwable("muMiniIso_top3",3)){
-		    	for(int imu = 0; imu<nSelMuons_top3; ++imu){
-					MapKinVar.get_throwable("muMiniIso_top3",4)->Fill((*muMiniIso_singleLepCalc)[selMuonIndicies[imu]] ,weight);
-				}
-			}
+			//need to revisit how to plot top3 properly!!
+// 			if(KinVarSwitches->get_throwable("eleMiniIso_top3",3)){
+// 		    	for(int iele = 0; iele<nSelEle_top3; ++iele){
+// 					MapKinVar.get_throwable("eleMiniIso_top3",4)->Fill((*elMiniIso_singleLepCalc)[selEleIndicies[iele]] ,weight);
+// 				}
+// 			}
+// 
+// 			if(KinVarSwitches->get_throwable("muMiniIso_top3",3)){
+// 		    	for(int imu = 0; imu<nSelMuons_top3; ++imu){
+// 					MapKinVar.get_throwable("muMiniIso_top3",4)->Fill((*muMiniIso_singleLepCalc)[selMuonIndicies[imu]] ,weight);
+// 				}
+// 			}
 
 			
 		    if(KinVarSwitches->get_throwable("lepDPhi",3)){
@@ -1543,7 +1557,8 @@ if(printlevel > 5) cout << "F" << std::endl;
 
 				if(KinVarSwitches->get_throwable("yield",3)) FillBkg(MapKinVar.get_throwable("yield",4),yield_bkg, bkgweights, weight);
 
-				if(KinVarSwitches->get_throwable("nTightLep",3)) FillBkg(MapKinVar.get_throwable("nTightLep",4),selLepTightIndicies.size(), bkgweights, weight);
+				if(KinVarSwitches->get_throwable("nLep",3)) FillBkg(MapKinVar.get_throwable("nLep",4),nSelLep, bkgweights, weight);
+				if(KinVarSwitches->get_throwable("nTightLep",3)) FillBkg(MapKinVar.get_throwable("nTightLep",4),nTightLep, bkgweights, weight);
 				if(KinVarSwitches->get_throwable("nJ",3)) FillBkg(MapKinVar.get_throwable("nJ",4),nJetAK4, bkgweights, weight);
 				if(KinVarSwitches->get_throwable("nBm",3)) FillBkg(MapKinVar.get_throwable("nBm",4),nBJetAK4CISVm, bkgweights, weight);
 				if(KinVarSwitches->get_throwable("nBl",3)) FillBkg(MapKinVar.get_throwable("nBl",4),nBJetAK4CISVl, bkgweights, weight);
@@ -1595,17 +1610,18 @@ if(printlevel > 5) cout << "F" << std::endl;
 					}
 				}
 
-				if(KinVarSwitches->get_throwable("eleMiniIso_top3",3)){
-					for(int iele = 0; iele<nSelEle_top3; ++iele){
-						FillBkg(MapKinVar.get_throwable("eleMiniIso_top3",4), (*elMiniIso_singleLepCalc)[selEleIndicies[iele]], bkgweights, weight);
-					}
-				}
-
-				if(KinVarSwitches->get_throwable("muMiniIso_top3",3)){
-					for(int imu = 0; imu<nSelMuons_top3; ++imu){
-						FillBkg(MapKinVar.get_throwable("muMiniIso_top3",4), (*muMiniIso_singleLepCalc)[selMuonIndicies[imu]], bkgweights ,weight);
-					}
-				}
+				//need to revisit how to plot top3 properly!!
+// 				if(KinVarSwitches->get_throwable("eleMiniIso_top3",3)){
+// 					for(int iele = 0; iele<nSelEle_top3; ++iele){
+// 						FillBkg(MapKinVar.get_throwable("eleMiniIso_top3",4), (*elMiniIso_singleLepCalc)[selEleIndicies[iele]], bkgweights, weight);
+// 					}
+// 				}
+// 
+// 				if(KinVarSwitches->get_throwable("muMiniIso_top3",3)){
+// 					for(int imu = 0; imu<nSelMuons_top3; ++imu){
+// 						FillBkg(MapKinVar.get_throwable("muMiniIso_top3",4), (*muMiniIso_singleLepCalc)[selMuonIndicies[imu]], bkgweights ,weight);
+// 					}
+// 				}
 
 				
 				if(KinVarSwitches->get_throwable("lepDPhi",3)) {
