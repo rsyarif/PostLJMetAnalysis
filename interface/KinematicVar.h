@@ -136,7 +136,8 @@ LabelKinVars setupAllKinematicVar(){
 	allKinVars->set("MET", new KinematicVar("MET","Missing Transverse Energy","#slash{E}_{T} (GeV)",false, 240, 0.f, 600, 120));
 	allKinVars->set("nJ", new KinematicVar("nJ", "Number of Jets", "Number of Jets",false, 8, 0.f, 8));
 
-	allKinVars->set("nTightLep", new KinematicVar("nLep", "Number of Tight Leptons", "Number of Tight Leptons",false, 7, 1.f, 8));
+	allKinVars->set("nLep", new KinematicVar("nLep", "Number of Leptons", "Number of Leptons",false, 10, 0.f, 10));
+	allKinVars->set("nTightLep", new KinematicVar("nLep", "Number of Tight Leptons", "Number of Tight Leptons",false, 10, 0.f, 10));
 
 	allKinVars->set("nBm", new KinematicVar("nBm", "Number of B-Jets", "Number of B-Jets",false, 6, 0.f, 6));
 	allKinVars->set("nBl", new KinematicVar("nBl", "Number of Loose B-Jets", "Number of Loose B-Jets",false, 6, 0.f, 6));
