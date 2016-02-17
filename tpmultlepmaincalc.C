@@ -758,7 +758,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
     if(!makeBkgs && (nTightMuons + nTightEle < 3) ) continue;
     else if(makeBkgs && ( nLooseMuons + nLooseEle < 3)  ) continue;
 
-	if(printlevel >= 3){
+	if(printlevel >= 5){
 		cout << "===== After trilepton cut ===== event = "<< jentry << endl;
 		cout << "makeBKgs: " << makeBkgs <<", nTightMuons: "<< nTightMuons <<", nTightEle: "<< nTightEle << endl;
 		cout << "          " << makeBkgs <<", nLooseMuons: "<< nLooseMuons <<", nLooseEle: "<< nLooseEle << endl;
@@ -879,7 +879,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	selLepIndicies.insert(selLepIndicies.end(), selLepTightIndicies.begin(), selLepTightIndicies.end());
 	selLepIndicies.insert(selLepIndicies.end(), selLepLooseIndicies.begin(), selLepLooseIndicies.end());
 	
-	if(printlevel >= 3){
+	if(printlevel >= 5){
 		cout << "===== After sort ===== event = "<< jentry << endl;
 		cout << " nSelLep = " << nSelLep << ", nTightLep = "<< nTightLep << ", nTightEle = " << nTightEle << ", nTightMuons = " << nTightMuons << endl;
 		for(int ilep = 0; ilep<nSelLep; ++ilep){
@@ -1308,6 +1308,10 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	    }
 	    else{ cerr<<"Error! no combination of eee, eem, emm, mmm, so what the hell is it?"<<endl; assert(0);}
 	}//end make background weights.
+	if(printlevel >=5){ 
+		cout << " is_elelel = "<< is_elelel << ", is_elelmu = "<< is_elelmu << ", is_elmumu = "<<is_elmumu << ", is_mumumu = "<<is_mumumu << endl; 
+		for(int imode=0;imode<nmodes;imode++)cout << "bkgweights["<<imode<<"] ="<< bkgweights[imode]<<endl;	
+	}	
 	if(printlevel > 5) cout << "check point A" << endl; //debug rizki
 	if(is_elelel){
 		Neee[nTightEle_top3]++;
