@@ -835,8 +835,15 @@ void post(){
 			///////////////// Ratio subplot ///////////////////////
 		    pad_ratio->cd();
 
-		    TH1F* ratio = DivideHists(datahist,MCbackground);	//ot be drawn as data. with Draw("Esame")
-		    ratio->GetYaxis()->SetTitle("Data/MC Bkg");
+		    TH1F* ratio ;
+		    if(!draw_ddbkg){
+		    	ratio = DivideHists(datahist,MCbackground);	//ot be drawn as data. with Draw("Esame")
+		    	ratio->GetYaxis()->SetTitle("Data/MC Bkg");
+		    }
+		    else{
+		    	ratio = DivideHists(datahist,background);	//ot be drawn as data. with Draw("Esame")
+		    	ratio->GetYaxis()->SetTitle("Data/Bkg");
+		    }
 		    PrettyRatioPlot(ratio);
 		    PrettyMarker(ratio);
 		    ratio->GetYaxis()->SetRangeUser(0.,2.);
@@ -1146,8 +1153,15 @@ void post(){
 			///////////////// Ratio subplot ///////////////////////
 		    pad_ratio->cd();
 
-		    TH1F* ratio = DivideHists(datahist,MCbackground);	//ot be drawn as data. with Draw("Esame")
-		    ratio->GetYaxis()->SetTitle("Data/MC Bkg");
+		    TH1F* ratio;
+		    if(!draw_ddbkg){
+		    	ratio = DivideHists(datahist,MCbackground);	//ot be drawn as data. with Draw("Esame")
+		    	ratio->GetYaxis()->SetTitle("Data/MC Bkg");
+		    }
+		    else{
+		    	ratio = DivideHists(datahist,background);	//ot be drawn as data. with Draw("Esame")
+		    	ratio->GetYaxis()->SetTitle("Data/Bkg");
+		    }
 		    PrettyRatioPlot(ratio);
 		    PrettyMarker(ratio);
 		    ratio->GetYaxis()->SetRangeUser(0.,2.);
