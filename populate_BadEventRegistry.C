@@ -12,12 +12,12 @@ void populate_from_file(eventRegistry* BadEventRegistry, string filename, bool v
 
 
 void populate_BadEventRegistry(eventRegistry* BadEventRegistry, bool verbose){
-	//populates the bad event registry using known bad events from file. 
+	//populates the bad event registry using known bad events from file.
 	//File lists retreived Jan 27, 2016 from https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Event_Lists
 	//This is the main script to interface with.
     clock_t startfor = clock();
 
-    populate_from_file(BadEventRegistry, "/uscms_data/d2/abarker/area2/CMSSW_7_4_7/src/LJMet/Com/BadEventsBadEvents/badResolutionTrack_Jan13.txt", verbose);
+    populate_from_file(BadEventRegistry, "/uscms_data/d2/abarker/area2/CMSSW_7_4_7/src/LJMet/Com/BadEvents/badResolutionTrack_Jan13.txt", verbose);
     populate_from_file(BadEventRegistry, "/uscms_data/d2/abarker/area2/CMSSW_7_4_7/src/LJMet/Com/BadEvents/csc2015_Dec01.txt", verbose);
     populate_from_file(BadEventRegistry, "/uscms_data/d2/abarker/area2/CMSSW_7_4_7/src/LJMet/Com/BadEvents/ecalscn1043093_Dec01.txt", verbose);
     populate_from_file(BadEventRegistry, "/uscms_data/d2/abarker/area2/CMSSW_7_4_7/src/LJMet/Com/BadEvents/muonBadTrack_Jan13.txt", verbose);
