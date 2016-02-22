@@ -158,7 +158,7 @@ LabelKinVars setupAllKinematicVar(){
 
 	allKinVars->set("Mlll", new KinematicVar("Mlll","Trilepton Mass","M_{lll} (GeV)",false, 100, 0, 200, 200)); //probably end up with custom rebinning here.
 	allKinVars->set("Mll", new KinematicVar("Mll","Dilepton Mass","M_{ll} (GeV)",false, 100, 0, 200, 200));
-	allKinVars->set("minMll", new KinematicVar("minMlll","Minimum Dilepton Mass","Min(M_{ll}) (GeV)",false, 100, 0, 200, 200));
+	allKinVars->set("minMll", new KinematicVar("minMll","Minimum Dilepton Mass","Min(M_{ll}) (GeV)",false, 100, 0, 200, 200));
 
 	{   KinematicVar* temp = new KinematicVar("MinMlb","Minimum lepton-bjet mass","Min(M_{lb}) (GeV)",false, 60, 0, 600);
 	Double_t a[] = {0, 34, 68, 102, 136, 170, 204, 238, 300, 400, 600};
@@ -202,6 +202,11 @@ LabelKinVars setupAllKinematicVar(){
 	allKinVars->set("eleMiniIso_top3", new KinematicVar("eleMiniIso_top3","electron miniIsolation (of top 3 selected leptons) ","e miniIsolation (of 3 leading leptons)",false,100,0,0.5,1));
 	allKinVars->set("muMiniIso_top3", new KinematicVar("muMiniIso_top3","muon miniIsolation (of top 3 selected leptons) ","#mu miniIsolation (of 3 leading leptons",false,100,0,0.5,1));
 
+	allKinVars->set("jetLooseNotTightMuonDR", new KinematicVar("jetLooseNotTightMuonDR","dR between jets and LooseNotTight Muons","dR(jet,#mu)",false,120,0,1.2,2));
+	allKinVars->set("TightEleLooseNotTightMuonDR", new KinematicVar("TightEleLooseNotTightMuonDR","dR between tight electrons and looseNotTight muons ","dR(e,#mu)",false,120,0,1.2,2));
+	allKinVars->set("LooseMuonLooseNotTightEleDR", new KinematicVar("LooseMuonLooseNotTightEleDR","dR between loose muons and LooseNotTight electrons","dR(#mu,e)",false,120,0,1.2,2));
+	allKinVars->set("jetLooseNotTightEleDR", new KinematicVar("jetLooseNotTightEleDR","dR between between jets and LooseNotTight electons","dR(jet,e)",false,120,0,1.2,2));
+	
 
 	return allKinVars;
 }//end setupAllKinematicVar

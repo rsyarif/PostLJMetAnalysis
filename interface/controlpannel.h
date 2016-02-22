@@ -41,8 +41,7 @@ int bumpBtagEff = 0;//is allowed to be +- 1 and 0
 
 	///LISTS FOR INDEXING
 const int nEventTopologies = 53; // the number of types of cuts selected, like 1JB...
-//const int nEventTopologies = 37; // the number of types of cuts selected, like 1JB...
-//const int nEventTopologies = 24; // the number of types of cuts selected, like 1JB...
+// const int nEventTopologies = 2; // the number of types of cuts selected, like 1JB...
 string s_EventTopology[nEventTopologies] = {
  "NULL","main",//2
 
@@ -76,21 +75,22 @@ string s_EventTopology[nEventTopologies] = {
  };
 
 
-const int nKinemVars_all = 27;
+const int nKinemVars_all = 31;
 string s_KinemVars_all[nKinemVars_all]={
-				"nLep","nTightLep","nJ",//"nBl", 
-                "nBm", //"BTm", "BTl",
-                "LHT", "HT", "ST",
-                "LepT", //"EleTT", "MuT",
-                "MET", "Mlll", "Mll","minMll", //"MinMlb",
-				"lepPt","lepEta","lepDPhi","minLepDPhi", 
-				"lepDR","minLepDR",
-				"jetPt","jetEta","leadjetDR",
-				"lepJetDR",//"leadBjetDR", 
-				"MSum", "MtSum",
-				"eleMiniIso","muMiniIso",
-// 				"eleMiniIso_top3","muMiniIso_top3",
-                "yield", //"yieldsum"};
+				"nLep","nTightLep","nJ",//"nBl", //3
+                "nBm", //"BTm", "BTl", //1
+                "LHT", "HT", "ST", //3
+                "LepT", //"EleTT", "MuT", //1
+                "MET", "Mlll", "Mll","minMll", //"MinMlb", //4
+				"lepPt","lepEta","lepDPhi","minLepDPhi",  //4
+				"lepDR","minLepDR", //2
+				"jetLooseNotTightMuonDR","TightEleLooseNotTightMuonDR","LooseMuonLooseNotTightEleDR","jetLooseNotTightEleDR", //4
+				"jetPt","jetEta","leadjetDR", //3
+				"lepJetDR",//"leadBjetDR",  //1
+				"MSum", "MtSum", //2
+				"eleMiniIso","muMiniIso", //2
+ 				// "eleMiniIso_top3","muMiniIso_top3",
+                "yield", //"yieldsum"}; //1
 				//"BLovHT", "BMovHT", "LepTovHT", 
 				//"HTovST", "LepTovST", "METovST", "MSumovST", 
 				};

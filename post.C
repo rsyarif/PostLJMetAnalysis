@@ -273,6 +273,12 @@ void post(){
 					else if(thiskinvar->tag.compare("lepPt") == 0) temp2 = (TH1F*)temp2->Rebin(4,(string(temp2->GetName())+"_r").c_str());	
 					else if(thiskinvar->tag.compare("jetPt") == 0) temp2 = (TH1F*)temp2->Rebin(4,(string(temp2->GetName())+"_r").c_str());	
 
+					else if(thiskinvar->tag.compare("jetLooseNotTightMuonDR") == 0) temp2 = (TH1F*)temp2->Rebin(2,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("TightEleLooseNotTightMuonDR") == 0) temp2 = (TH1F*)temp2->Rebin(2,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("LooseMuonLooseNotTightEleDR") == 0) temp2 = (TH1F*)temp2->Rebin(2,(string(temp2->GetName())+"_r").c_str());	
+					else if(thiskinvar->tag.compare("jetLooseNotTightEleDR") == 0) temp2 = (TH1F*)temp2->Rebin(2,(string(temp2->GetName())+"_r").c_str());	
+
+
 				    temp2->SetTitle( thiskinvar->titles.c_str() );
 				    temp2->SetXTitle( thiskinvar->xlabels.c_str() );
 				    temp2->SetYTitle( "Events" );
@@ -410,6 +416,12 @@ void post(){
 				else if(thiskinvar->tag.compare("MtSum") == 0) temp2 = (TH2F*)temp2->RebinX(25,(string(temp2->GetName())+"_r").c_str());	
 				else if(thiskinvar->tag.compare("lepPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
 				else if(thiskinvar->tag.compare("jetPt") == 0) temp2 = (TH2F*)temp2->RebinX(4,(string(temp2->GetName())+"_r").c_str());	
+
+				else if(thiskinvar->tag.compare("jetLooseNotTightMuonDR") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("TightEleLooseNotTightMuonDR") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("LooseMuonLooseNotTightEleDR") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+				else if(thiskinvar->tag.compare("jetLooseNotTightEleDR") == 0) temp2 = (TH2F*)temp2->RebinX(2,(string(temp2->GetName())+"_r").c_str());	
+
 
 				temp2->SetTitle( thiskinvar->titles.c_str() );
 				temp2->SetXTitle( thiskinvar->xlabels.c_str() );

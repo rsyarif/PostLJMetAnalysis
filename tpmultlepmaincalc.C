@@ -609,10 +609,6 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	indexPtSort(selMuonIndicies,    nSelMuons, (*muPt_singleLepCalc));
 	indexPtSort(TightMuonIndicies,nTightMuons, (*muPt_singleLepCalc));
 
-	for(int imu = 0; imu<nSelMuons; ++imu) MuT+= (*muPt_singleLepCalc)[selMuonIndicies[imu]];
-
-
-
 
 	/////////////////////////////////////////////////////////////////
 	//////////////////////// FIND pfElectrons  //////////////////////
@@ -660,9 +656,9 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	    TLorentzVector Vele, Vmu;
 	    Vele.SetPtEtaPhiE ((*elPt_singleLepCalc)[iele],(*elEta_singleLepCalc)[iele], (*elPhi_singleLepCalc)[iele], (*elEnergy_singleLepCalc)[iele]);
 	    if(printlevel >= 7) cout<<"approach muon dR cutwork"<<endl;
-	    for(int imu = 0; imu<nSelMuons && !eleFailsMuDRcut; ++imu){
-		Vmu.SetPtEtaPhiE ( (*muPt_singleLepCalc)[selMuonIndicies[imu]], (*muEta_singleLepCalc)[selMuonIndicies[imu]], (*muPhi_singleLepCalc)[selMuonIndicies[imu]], (*muEnergy_singleLepCalc)[selMuonIndicies[imu]]); 
-		eleFailsMuDRcut |= isSameObject(Vele, Vmu, 0.1);
+			for(int imu = 0; imu<nTightMuons && !eleFailsMuDRcut; ++imu){
+			Vmu.SetPtEtaPhiE ( (*muPt_singleLepCalc)[TightMuonIndicies[imu]], (*muEta_singleLepCalc)[TightMuonIndicies[imu]], (*muPhi_singleLepCalc)[TightMuonIndicies[imu]], (*muEnergy_singleLepCalc)[TightMuonIndicies[imu]]); 
+			eleFailsMuDRcut |= isSameObject(Vele, Vmu, 0.1);
 	    } //end dR cut. 
 	    if(eleFailsMuDRcut) continue;
 	    if(printlevel >= 7) cout<<"survived muon dR cut"<<endl;
@@ -746,19 +742,365 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	indexPtSort(selEleIndicies,nSelEle,  (*elPt_singleLepCalc));
 	indexPtSort(TightEleIndicies,nTightEle,  (*elPt_singleLepCalc));
 
+
+	/////////////////////////////////////////////////////////////////
+	//////////////////////// FIND JETS  /////////////////////////////
+	/////////////////////////////////////////////////////////////////
+	//        _      _       
+	//       | | ___| |_ ___ 
+	//    _  | |/ _ \ __/ __|
+	//   | |_| |  __/ |_\__ \
+	//    \___/ \___|\__|___/
+	//                       
+	//xxjets
+	if(printlevel >= 5) cout<<"Begind jets"<<endl;
+	vector<int> JetAK4Indicies;
+	int nJetAK4= 0;
+	float HT = 0;
+	float jetSFs[3] = {1.f}; //enum JetSFmode{JetSFnominal = 0, JetSFup = 1, JetSFdown = 2};
+	TLorentzVector VHad(0,0,0,0);
+	for(int ijet = 0; ijet< (int)AK4JetPt_singleLepCalc->size(); ++ijet){ //jets are approxomately sorted in Pt order. 
+	    //but you saw an instance of
+	    //JetPt: 189.88 25.9926 80.4774 
+	    //strange thing: we always have at least two jets. 
+	    //these are born with pt > 25 cut and |eta| < 2.5 cut
+	    if((*AK4JetPt_singleLepCalc)[ijet] < 35 || fabs((*AK4JetEta_singleLepCalc)[ijet]) > 2.4) continue;
+
+	    //seperate the leptons from the jets using cuts listed in B2G-12-015
+	    bool jet_passes_DR = true;
+	    TLorentzVector vJ, vEl, vMu;
+	    vJ.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+	    for(int iel = 0; iel<nTightEle && jet_passes_DR; ++iel){
+			int iele = TightEleIndicies[iel];
+			vEl.SetPtEtaPhiE((*elPt_singleLepCalc)[iele],(*elEta_singleLepCalc)[iele], (*elPhi_singleLepCalc)[iele], (*elEnergy_singleLepCalc)[iele]);
+			jet_passes_DR &= !isSameObject(vJ, vEl, 0.3);
+	    }	
+	    if(!jet_passes_DR) continue;
+		for(int iMu = 0; iMu<nTightMuons && jet_passes_DR; ++iMu){
+			int imu = TightMuonIndicies[iMu];
+			vMu.SetPtEtaPhiE((*muPt_singleLepCalc)[imu], (*muEta_singleLepCalc)[imu], (*muPhi_singleLepCalc)[imu], (*muEnergy_singleLepCalc)[imu]); 
+			jet_passes_DR &= !isSameObject(vJ, vMu, 0.4);
+	    }	
+	    if(!jet_passes_DR) continue;
+
+	    //jet passes:
+	    if(dmcblock->isMC) GetJetSF( (*AK4JetPt_singleLepCalc)[ijet], jetSFs);
+
+	    JetAK4Indicies.push_back(ijet);
+	    nJetAK4++;
+	    HT += (*AK4JetPt_singleLepCalc)[ijet];
+	    VHad = VHad + vJ;
+	}//end for all jets
+	indexPtSort(JetAK4Indicies, nJetAK4, (*AK4JetPt_singleLepCalc));
+	//
+	//      Int_t           nJets_CATopoCalc
+	//      AK4HT_singleLepCalc
+	//      theJetHT_JetSubCalc
+
+	float leadjetDR = -1;
+	if(nJetAK4 >=2){
+	    TLorentzVector vJ1, vJ2;
+	    int ijet = JetAK4Indicies[0];
+	    vJ1.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+	    ijet = JetAK4Indicies[1];
+	    vJ2.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+	    leadjetDR = dR(vJ1,vJ2);
+	}//end calculate leadjetDR
+
+	/////////////////////////////////////////////////////////////////
+	//////////////////////// FIND B-JETS  ///////////////////////////
+	/////////////////////////////////////////////////////////////////
+	//    ____            _      _       
+	//   | __ )          | | ___| |_ ___ 
+	//   |  _ \ _____ _  | |/ _ \ __/ __|
+	//   | |_) |_____| |_| |  __/ |_\__ \
+	//   |____/       \___/ \___|\__|___/
+	//                                   
+	// xxbtag
+	float BTl = 0;
+	float BTm = 0;
+	//theJetBTag_JetSubCalc
+	//theJetFlav_JetSubCalc;
+	//theJetCSV_JetSubCalc;
+	//nBJets_CATopoCalc
+	//int AK4JetBTag_singleLepCalc;  = int value representing a bool = isJetTagged
+	//double AK4JetBDisc_singleLepCalc; = pfCombinedInclusiveSecondaryVertexV2BJetTags
+	//CISVv2L
+	//CISVv2M
+	//CISVv2T 
+
+	if(printlevel >= 5) cout<<"Begind Bjets"<<endl;
+	vector<int> BJetAK4CISVmIndicies; //these include all the efficiencies and scale factors
+	int nBJetAK4CISVm= 0;
+
+	vector<int> BJetAK4CISVtIndicies; //dumb CISV cut, no efficiencies or SF's
+	int nBJetAK4CISVt= 0;
+
+	vector<int> BJetAK4CISVmSimpleIndicies;//dumb CISV cut, no efficiencies or SF's
+	int nBJetAK4CISVmSimple= 0;
+
+	vector<int> BJetAK4CISVlIndicies;//dumb CISV cut, no efficiencies or SF's
+	int nBJetAK4CISVl= 0;
+
+	for(int ijet = 0; ijet<nJetAK4; ++ijet){
+	    if((*AK4JetBTag_singleLepCalc)[JetAK4Indicies[ijet]] == 1){ //these include all the scale factors and efficiencies.
+		BJetAK4CISVmIndicies.push_back(JetAK4Indicies[ijet]);
+		nBJetAK4CISVm++;
+	    }
+	    float cisv = (*AK4JetBDisc_singleLepCalc)[JetAK4Indicies[ijet]];
+
+	    //if(cisv > CISVv2L){
+	    if((*theJetBTagLoose_JetSubCalc)[JetAK4Indicies[ijet]]==1){
+		BJetAK4CISVlIndicies.push_back(JetAK4Indicies[ijet]);
+		nBJetAK4CISVl++;
+		BTl += (*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]];
+	    }
+
+		//if(cisv > CISVv2M){
+		if((*theJetBTag_JetSubCalc)[JetAK4Indicies[ijet]]==1){
+		    BJetAK4CISVmSimpleIndicies.push_back(JetAK4Indicies[ijet]);
+		    nBJetAK4CISVmSimple++;
+		    BTm += (*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]];
+
+		    if(cisv > CISVv2T){
+			BJetAK4CISVtIndicies.push_back(JetAK4Indicies[ijet]);
+			nBJetAK4CISVt++;
+		    }//end if tight
+
+		}//end if medium
+
+	}//end for all used jets
+
+	indexPtSort(BJetAK4CISVmIndicies, nBJetAK4CISVm, (*AK4JetPt_singleLepCalc));
+	indexPtSort(BJetAK4CISVtIndicies, nBJetAK4CISVt, (*AK4JetPt_singleLepCalc));
+	indexPtSort(BJetAK4CISVmSimpleIndicies, nBJetAK4CISVmSimple, (*AK4JetPt_singleLepCalc));
+	indexPtSort(BJetAK4CISVlIndicies, nBJetAK4CISVl, (*AK4JetPt_singleLepCalc));
+
+	float leadBjetDR = -1;
+	if(nBJetAK4CISVm >=2){
+	    TLorentzVector vJ1, vJ2;
+	    int ijet = BJetAK4CISVmIndicies[0];
+	    vJ1.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+	    ijet = BJetAK4CISVmIndicies[1];
+	    vJ2.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+	    leadBjetDR = dR(vJ1,vJ2);
+	}//end calculate leadjetDR
+
+	/*	float Bl_over_HT= BTl/HT;//(0,1)
+		float Bm_over_HT= BTm/HT;//(0,1)
+		float LepT_over_HT= LepT/HT;
+		float HT_over_ST= HT/ST;//(0,1)
+		float LepT_over_ST= LepT/ST;//(0,1)
+		float MET_over_ST= corr_met_singleLepCalc/ST; //(0,1)
+		float MSum_over_ST= MSum/ST;*/
+		
+                                                                                                                  
+                                                                                                                  
+//   ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ 
+//  |______|______|______|______|______|______|______|______|______|______|______|______|______|______|______|______|
+//   _                     _                        _            _                                      _            
+//  | |                   | |                      | |          | |                                    (_)           
+//  | | ___   ___  _ __   | | ___   ___  ___  ___  | | ___ _ __ | |_ ___  _ __  ___    __ _  __ _  __ _ _ _ __       
+//  | |/ _ \ / _ \| '_ \  | |/ _ \ / _ \/ __|/ _ \ | |/ _ \ '_ \| __/ _ \| '_ \/ __|  / _` |/ _` |/ _` | | '_       
+//  | | (_) | (_) | |_) | | | (_) | (_) \__ \  __/ | |  __/ |_) | || (_) | | | \__ \ | (_| | (_| | (_| | | | | |     
+//  |_|\___/ \___/| .__/  |_|\___/ \___/|___/\___| |_|\___| .__/ \__\___/|_| |_|___/  \__,_|\__, |\__,_|_|_| |_|     
+//                | |                                     | |                                __/ |                   
+//                |_|                                     |_|                               |___/                    
+//   ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ 
+//  |______|______|______|______|______|______|______|______|______|______|______|______|______|______|______|______|
+
+	//Object cleaning. Remove overlapping objects. Order of priority: Tight muon > tight ele > jets > loose(nottight) muons > loose(nottight) ele. - start
+	bool LoopLooseLeptons  = true;
+	bool TrimLooseLeptons  = true;
+	vector<float> jetLooseNotTightMuonDR,TightEleLooseNotTightMuonDR,LooseMuonLooseNotTightEleDR,jetLooseNotTightEleDR;
+	if(LoopLooseLeptons){   		
+		bool DisplayOut = (printlevel>=5);
+		bool isLepRemoved = false;
+		int countLepRemoved = 0;
+		if(DisplayOut) cout << "---- BEGIN OBJECT CLEANING ---- event = "<< jentry << endl;
+		TLorentzVector vJ, vEl, vMu;                                                                                                   
+	    //dR cut Loose(nottight) muons with Jet, tight ele. 
+	    bool isLooseMuon_pass;
+		for(int iMu = 0; iMu<nLooseMuons; ++iMu){
+			int imu = LooseMuonIndicies[iMu];
+			vMu.SetPtEtaPhiE((*muPt_singleLepCalc)[imu], (*muEta_singleLepCalc)[imu], (*muPhi_singleLepCalc)[imu], (*muEnergy_singleLepCalc)[imu]); 
+			if(isMuTight[LooseMuonIndicies[iMu]]) continue; //only consider loose but NOT tight!
+
+			//compare loose(not tight) muon with jet
+			isLooseMuon_pass = true;
+			for(int iJet=0; iJet<nJetAK4; ++iJet){		
+				if(!isLooseMuon_pass) continue;
+				
+				int ijet = JetAK4Indicies[iJet];
+				vJ.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+				if(TrimLooseLeptons)isLooseMuon_pass = !isSameObject(vJ, vMu, 0.4);
+				if(isLooseMuon_pass)jetLooseNotTightMuonDR.push_back(dR(vJ, vMu));
+			}
+			if(!isLooseMuon_pass){
+				if(DisplayOut) cout << "dR(jet, loose(not tight) muon): "<< jetLooseNotTightMuonDR.back() << endl;
+				if(DisplayOut) cout << "(before) LooseMuonIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseMuonIndicies.size();i++) cout	<< LooseMuonIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+				if(TrimLooseLeptons)LooseMuonIndicies.erase(std::remove(LooseMuonIndicies.begin(), LooseMuonIndicies.end(), imu), LooseMuonIndicies.end()); //remove muon from LooseMuon list
+				if(TrimLooseLeptons)isLepRemoved = true;
+				if(TrimLooseLeptons)countLepRemoved++;
+				if(DisplayOut) cout << "(after) LooseMuonIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseMuonIndicies.size();i++) cout	<< LooseMuonIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+
+				continue; // move on if this muon is already overlaps with jet.
+			}
+
+			//compare loose(not tight) muon with tight ele
+			isLooseMuon_pass = true;
+			for(int iel=0; iel<nTightEle; ++iel){		
+				if(!isLooseMuon_pass) continue;
+				
+				int iele = TightEleIndicies[iel];
+				vEl.SetPtEtaPhiE((*elPt_singleLepCalc)[iele],(*elEta_singleLepCalc)[iele], (*elPhi_singleLepCalc)[iele], (*elEnergy_singleLepCalc)[iele]);
+				if(TrimLooseLeptons)isLooseMuon_pass = !isSameObject(vEl, vMu, 0.1);
+				if(isLooseMuon_pass)TightEleLooseNotTightMuonDR.push_back(dR(vEl, vMu));
+			}
+			if(!isLooseMuon_pass){
+				if(DisplayOut) cout << "dr(Tight ele, loose(not tight) muon): "<<TightEleLooseNotTightMuonDR.back() << endl;
+				if(DisplayOut) cout << "(before) LooseMuonIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseMuonIndicies.size();i++) cout	<< LooseMuonIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+				if(TrimLooseLeptons)LooseMuonIndicies.erase(std::remove(LooseMuonIndicies.begin(), LooseMuonIndicies.end(), imu), LooseMuonIndicies.end()); //remove muon from LooseMuon list
+				if(TrimLooseLeptons)isLepRemoved = true;
+				if(TrimLooseLeptons)countLepRemoved++;
+
+				if(DisplayOut) cout << "(after) LooseMuonIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseMuonIndicies.size();i++) cout	<< LooseMuonIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+			}
+
+			
+		}
+		
+		//dR cut between loose(not tight) ele and loose(inclusive) muon, jet. 
+		bool isLooseEle_pass;
+		for(int iel = 0; iel<nLooseEle; ++iel){
+			int iele = LooseEleIndicies[iel];
+			vEl.SetPtEtaPhiE((*elPt_singleLepCalc)[iele],(*elEta_singleLepCalc)[iele], (*elPhi_singleLepCalc)[iele], (*elEnergy_singleLepCalc)[iele]);
+			if(isEleTight[LooseEleIndicies[iel]]) continue; //only consider loose but NOT tight!			
+
+			//compare loose(not tight) ele with loose(inclusive) muon
+			isLooseEle_pass = true;
+			for(int iMu = 0; iMu<nLooseMuons; ++iMu){
+				if(!isLooseEle_pass) continue;
+				
+				int imu = LooseMuonIndicies[iMu];
+				vMu.SetPtEtaPhiE((*muPt_singleLepCalc)[imu], (*muEta_singleLepCalc)[imu], (*muPhi_singleLepCalc)[imu], (*muEnergy_singleLepCalc)[imu]); 
+				if(TrimLooseLeptons)isLooseEle_pass = !isSameObject(vMu, vEl, 0.1);				
+				if(isLooseEle_pass)LooseMuonLooseNotTightEleDR.push_back(dR(vMu, vEl));
+			}
+			if(!isLooseEle_pass){
+				if(DisplayOut) cout << "dR(loose(inclusive) muon, loose(not tight) ele): "<<LooseMuonLooseNotTightEleDR.back() << endl;
+				if(DisplayOut) cout << "(before) LooseEleIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseEleIndicies.size();i++) cout	<< LooseEleIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+				if(TrimLooseLeptons)LooseEleIndicies.erase(std::remove(LooseEleIndicies.begin(), LooseEleIndicies.end(), iele), LooseEleIndicies.end()); //remove muon from LooseMuon list
+				if(TrimLooseLeptons)isLepRemoved = true;
+				if(TrimLooseLeptons)countLepRemoved++;
+
+				if(DisplayOut) cout << "(after) LooseEleIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseEleIndicies.size();i++) cout	<< LooseEleIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+
+				continue; // move on if this ele is already overlaps with muon.
+			}
+			
+			//compare loose(not tight) ele with jet
+			isLooseEle_pass = true;
+			for(int iJet=0; iJet<nJetAK4; ++iJet){		
+				if(!isLooseEle_pass) continue;				
+			
+				int ijet = JetAK4Indicies[iJet];
+				vJ.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
+				if(TrimLooseLeptons)isLooseEle_pass = !isSameObject(vJ, vEl, 0.3);
+				if(isLooseEle_pass)jetLooseNotTightEleDR.push_back(dR(vJ, vEl));
+			}
+			if(!isLooseEle_pass){
+				if(DisplayOut) cout << "dR(jet, loose(not tight) ele): "<<jetLooseNotTightEleDR.back() << endl;
+				if(DisplayOut) cout << "(before) LooseEleIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseEleIndicies.size();i++) cout	<< LooseEleIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+				if(TrimLooseLeptons)LooseEleIndicies.erase(std::remove(LooseEleIndicies.begin(), LooseEleIndicies.end(), iele), LooseEleIndicies.end()); //remove muon from LooseMuon list
+				if(TrimLooseLeptons)isLepRemoved = true;
+				if(TrimLooseLeptons)countLepRemoved++;
+
+				if(DisplayOut) cout << "(after) LooseEleIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseEleIndicies.size();i++) cout	<< LooseEleIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+
+				continue; // move on if this ele is already overlaps with jet.
+			}
+			
+			/*
+			//compare loose(not tight) ele with Tight muon
+			isLooseEle_pass = true;
+			for(int iMu = 0; iMu<nTightMuons; ++iMu){
+				if(!isLooseEle_pass) continue;
+				
+				int imu = TightMuonIndicies[imu];
+				vMu.SetPtEtaPhiE((*muPt_singleLepCalc)[imu], (*muEta_singleLepCalc)[imu], (*muPhi_singleLepCalc)[imu], (*muEnergy_singleLepCalc)[imu]); 
+				isLooseEle_pass = !isSameObject(vMu, vEl, 0.1);				
+			}
+			if(!isLooseEle_pass){
+				if(DisplayOut) cout << "tight muon - loose(not tight) ele loop:" << endl;
+				if(DisplayOut) cout << "(before) LooseEleIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseEleIndicies.size();i++) cout	<< LooseEleIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+				LooseEleIndicies.erase(std::remove(LooseEleIndicies.begin(), LooseEleIndicies.end(), iele), LooseEleIndicies.end()); //remove muon from LooseMuon list
+				isLepRemoved = true;
+				countLepRemoved++;
+
+				if(DisplayOut) cout << "(after) LooseEleIndicies = " ;
+				if(DisplayOut) for(unsigned int i=0 ; i<LooseEleIndicies.size();i++) cout	<< LooseEleIndicies[i] << ", ";
+				if(DisplayOut) cout << endl;
+			}
+			*/
+
+		}                         
+
+		if(DisplayOut && isLepRemoved){
+			cout << "===== " << countLepRemoved << " LEPTON(S) removed!! ===== event = "<< jentry << endl;
+			cout << "Initially before cleaning:" << endl; 
+			cout << "makeBKgs: " << makeBkgs <<", nTightMuons: "<< nTightMuons <<", nTightEle: "<< nTightEle << endl;
+			cout << "          " << makeBkgs <<", nLooseMuons: "<< nLooseMuons <<", nLooseEle: "<< nLooseEle << endl;
+			cout << "          " << makeBkgs <<", nLooseNotTightMuons: "<< nLooseMuons-nTightMuons <<", nLooseNotTightEle: "<< nLooseEle-nTightEle << endl;
+		}                                                                                         
+	}                                                                                                                  		
+	//Object cleaning. Remove overlapping objects. Order of priority: Tight muon > tight ele > jets > loose(nottight) muons > loose(nottight) ele. - end
+	
+	//Reassign lepton indicies after cleaning:
+
+	nLooseMuons = LooseMuonIndicies.size();
+	nLooseEle = LooseEleIndicies.size();
+
+	selEleIndicies = makeBkgs?LooseEleIndicies:TightEleIndicies;
+	nSelEle = makeBkgs?nLooseEle:nTightEle;
 	for(int iele = 0; iele<nSelEle; ++iele) EleT+= (*elPt_singleLepCalc)[selEleIndicies[iele]];
+
+	selMuonIndicies = makeBkgs?LooseMuonIndicies:TightMuonIndicies;
+	nSelMuons = makeBkgs?nLooseMuons:nTightMuons;
+	for(int imu = 0; imu<nSelMuons; ++imu) MuT+= (*muPt_singleLepCalc)[selMuonIndicies[imu]];
+
 
 	///////////////////////////////////////////////////////////////////
 	//////////////////////// Trilepton Cut /////////////////////////////
 	///////////////////////////////////////////////////////////////////
 
-	if(printlevel >= 5) cout<<"Make Trilepton Cut"<<endl;
+	bool DisplayTriLeptonCut = printlevel >= 5 ;
+	
+	if(DisplayTriLeptonCut) cout<<"------ Make Trilepton Cut ------"<<endl;
 	//then make a Trielectron cut.
 
     if(!makeBkgs && (nTightMuons + nTightEle < 3) ) continue;
     else if(makeBkgs && ( nLooseMuons + nLooseEle < 3)  ) continue;
 
-	if(printlevel >= 5){
+	if(DisplayTriLeptonCut){
 		cout << "===== After trilepton cut ===== event = "<< jentry << endl;
 		cout << "makeBKgs: " << makeBkgs <<", nTightMuons: "<< nTightMuons <<", nTightEle: "<< nTightEle << endl;
 		cout << "          " << makeBkgs <<", nLooseMuons: "<< nLooseMuons <<", nLooseEle: "<< nLooseEle << endl;
@@ -773,8 +1115,6 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 
 	assert(nLooseMuons + nLooseEle >= 3); //for background 
 	//At this point, we may be running backgrounds so we cannot assert three tight leptons.
-
-	float LepT = EleT + MuT;//LepT is total Transverse energy of all (Selected!!) leptons found. 
 
 	//Combine lists of electons and Muons into a combined list of leptons, then sort in pt and Tight/Loose - start
 
@@ -879,7 +1219,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	selLepIndicies.insert(selLepIndicies.end(), selLepTightIndicies.begin(), selLepTightIndicies.end());
 	selLepIndicies.insert(selLepIndicies.end(), selLepLooseIndicies.begin(), selLepLooseIndicies.end());
 	
-	if(printlevel >= 5){
+	if(DisplayTriLeptonCut){
 		cout << "===== After sort ===== event = "<< jentry << endl;
 		cout << " nSelLep = " << nSelLep << ", nTightLep = "<< nTightLep << ", nTightEle = " << nTightEle << ", nTightMuons = " << nTightMuons << endl;
 		for(int ilep = 0; ilep<nSelLep; ++ilep){
@@ -905,7 +1245,7 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 
 	if (selLepIndicies.size()<3){ 
 		cout << "Error! top 3 Selected Leptons is less than 3!! Will Seg Fault!"<< endl;
-// 		std::terminate(); //stops the program. why does this stop runone being able to be compiled???
+// 		std::terminate(); //stops the program. why does this stop runone/runall being able to be compiled???
 	}
 	
 	for(int ilep = 0; ilep<3; ++ilep){ 
@@ -988,163 +1328,29 @@ void tpmultlepmaincalc::Loop(eventRegistry* EventRegistry,eventRegistry* BadEven
 	    }
 	}//end else if is MC
 
-	/////////////////////////////////////////////////////////////////
-	//////////////////////// FIND JETS  /////////////////////////////
-	/////////////////////////////////////////////////////////////////
-	//        _      _       
-	//       | | ___| |_ ___ 
-	//    _  | |/ _ \ __/ __|
-	//   | |_| |  __/ |_\__ \
-	//    \___/ \___|\__|___/
-	//                       
-	//xxjets
-	if(printlevel >= 5) cout<<"Begind jets"<<endl;
-	vector<int> JetAK4Indicies;
-	int nJetAK4= 0;
-	float HT = 0;
-	float jetSFs[3] = {1.f}; //enum JetSFmode{JetSFnominal = 0, JetSFup = 1, JetSFdown = 2};
-	TLorentzVector VHad(0,0,0,0);
-	for(int ijet = 0; ijet< (int)AK4JetPt_singleLepCalc->size(); ++ijet){ //jets are approxomately sorted in Pt order. 
-	    //but you saw an instance of
-	    //JetPt: 189.88 25.9926 80.4774 
-	    //strange thing: we always have at least two jets. 
-	    //these are born with pt > 25 cut and |eta| < 2.5 cut
-	    if((*AK4JetPt_singleLepCalc)[ijet] < 35 || fabs((*AK4JetEta_singleLepCalc)[ijet]) > 2.4) continue;
-
-	    //seperate the leptons from the jets using cuts listed in B2G-12-015
-	    bool jet_passes_DR = true;
-	    TLorentzVector vJ, vEl, vMu;
-	    vJ.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
-	    for(int iel = 0; iel<nSelEle && jet_passes_DR; ++iel){
-		int iele = selEleIndicies[iel];
-		vEl.SetPtEtaPhiE((*elPt_singleLepCalc)[iele],(*elEta_singleLepCalc)[iele], (*elPhi_singleLepCalc)[iele], (*elEnergy_singleLepCalc)[iele]);
-		jet_passes_DR &= !isSameObject(vJ, vEl, 0.3);
-	    }	
-	    if(!jet_passes_DR) continue;
-	    for(int iMu = 0; iMu<nSelMuons && jet_passes_DR; ++iMu){
-		int imu = selMuonIndicies[iMu];
-		vMu.SetPtEtaPhiE((*muPt_singleLepCalc)[imu], (*muEta_singleLepCalc)[imu], (*muPhi_singleLepCalc)[imu], (*muEnergy_singleLepCalc)[imu]); 
-		jet_passes_DR &= !isSameObject(vJ, vMu, 0.4);
-	    }	
-	    if(!jet_passes_DR) continue;
-
-	    //jet passes:
-	    if(dmcblock->isMC) GetJetSF( (*AK4JetPt_singleLepCalc)[ijet], jetSFs);
-
-	    JetAK4Indicies.push_back(ijet);
-	    nJetAK4++;
-	    HT += (*AK4JetPt_singleLepCalc)[ijet];
-	    VHad = VHad + vJ;
-	}//end for all jets
-	indexPtSort(JetAK4Indicies, nJetAK4, (*AK4JetPt_singleLepCalc));
-	//
-	//      Int_t           nJets_CATopoCalc
-	//      AK4HT_singleLepCalc
-	//      theJetHT_JetSubCalc
+                                                                                      
+                                                                                      
+//   ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ 
+//  |______|______|______|______|______|______|______|______|______|______|______|______|
+//                                    | |                            | |   | |           
+//    _ __ ___   ___  _ __ ___    ___ | |__  ___  ___ _ ____   ____ _| |__ | | ___  ___  
+//   | '_ ` _ \ / _ \| '__/ _ \  / _ \| '_ \/ __|/ _ \ '__\ \ / / _` | '_ \| |/ _ \/ __| 
+//   | | | | | | (_) | | |  __/ | (_) | |_) \__ \  __/ |   \ V / (_| | |_) | |  __/\__  
+//   |_| |_| |_|\___/|_|  \___|  \___/|_.__/|___/\___|_|    \_/ \__,_|_.__/|_|\___||___/ 
+//   ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ ______ 
+//  |______|______|______|______|______|______|______|______|______|______|______|______|
+//                                                                                       
+                                                                                                                                                                            
+                                                                                      
+	float LepT = EleT + MuT;//LepT is total Transverse energy of all (Selected!!) leptons found. 
 
 	float ST = LepT + HT + corr_met_singleLepCalc; 
 	TLorentzVector VSum = VHad + VLep;
 	//float MHT = VHad.Pt();
 	float MSum = VSum.M();
 	float MtSum = Mt(VSum, corr_met_singleLepCalc, corr_met_phi_singleLepCalc);
-
-	float leadjetDR = -1;
-	if(nJetAK4 >=2){
-	    TLorentzVector vJ1, vJ2;
-	    int ijet = JetAK4Indicies[0];
-	    vJ1.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
-	    ijet = JetAK4Indicies[1];
-	    vJ2.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
-	    leadjetDR = dR(vJ1,vJ2);
-	}//end calculate leadjetDR
-
-	/////////////////////////////////////////////////////////////////
-	//////////////////////// FIND B-JETS  ///////////////////////////
-	/////////////////////////////////////////////////////////////////
-	//    ____            _      _       
-	//   | __ )          | | ___| |_ ___ 
-	//   |  _ \ _____ _  | |/ _ \ __/ __|
-	//   | |_) |_____| |_| |  __/ |_\__ \
-	//   |____/       \___/ \___|\__|___/
-	//                                   
-	// xxbtag
-	float BTl = 0;
-	float BTm = 0;
-	//theJetBTag_JetSubCalc
-	//theJetFlav_JetSubCalc;
-	//theJetCSV_JetSubCalc;
-	//nBJets_CATopoCalc
-	//int AK4JetBTag_singleLepCalc;  = int value representing a bool = isJetTagged
-	//double AK4JetBDisc_singleLepCalc; = pfCombinedInclusiveSecondaryVertexV2BJetTags
-	//CISVv2L
-	//CISVv2M
-	//CISVv2T 
-
-	if(printlevel >= 5) cout<<"Begind Bjets"<<endl;
-	vector<int> BJetAK4CISVmIndicies; //these include all the efficiencies and scale factors
-	int nBJetAK4CISVm= 0;
-
-	vector<int> BJetAK4CISVtIndicies; //dumb CISV cut, no efficiencies or SF's
-	int nBJetAK4CISVt= 0;
-
-	vector<int> BJetAK4CISVmSimpleIndicies;//dumb CISV cut, no efficiencies or SF's
-	int nBJetAK4CISVmSimple= 0;
-
-	vector<int> BJetAK4CISVlIndicies;//dumb CISV cut, no efficiencies or SF's
-	int nBJetAK4CISVl= 0;
-
-	for(int ijet = 0; ijet<nJetAK4; ++ijet){
-	    if((*AK4JetBTag_singleLepCalc)[JetAK4Indicies[ijet]] == 1){ //these include all the scale factors and efficiencies.
-		BJetAK4CISVmIndicies.push_back(JetAK4Indicies[ijet]);
-		nBJetAK4CISVm++;
-	    }
-	    float cisv = (*AK4JetBDisc_singleLepCalc)[JetAK4Indicies[ijet]];
-
-	    //if(cisv > CISVv2L){
-	    if((*theJetBTagLoose_JetSubCalc)[JetAK4Indicies[ijet]]==1){
-		BJetAK4CISVlIndicies.push_back(JetAK4Indicies[ijet]);
-		nBJetAK4CISVl++;
-		BTl += (*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]];
-	    }
-
-		//if(cisv > CISVv2M){
-		if((*theJetBTag_JetSubCalc)[JetAK4Indicies[ijet]]==1){
-		    BJetAK4CISVmSimpleIndicies.push_back(JetAK4Indicies[ijet]);
-		    nBJetAK4CISVmSimple++;
-		    BTm += (*AK4JetPt_singleLepCalc)[JetAK4Indicies[ijet]];
-
-		    if(cisv > CISVv2T){
-			BJetAK4CISVtIndicies.push_back(JetAK4Indicies[ijet]);
-			nBJetAK4CISVt++;
-		    }//end if tight
-
-		}//end if medium
-
-	}//end for all used jets
-
-	indexPtSort(BJetAK4CISVmIndicies, nBJetAK4CISVm, (*AK4JetPt_singleLepCalc));
-	indexPtSort(BJetAK4CISVtIndicies, nBJetAK4CISVt, (*AK4JetPt_singleLepCalc));
-	indexPtSort(BJetAK4CISVmSimpleIndicies, nBJetAK4CISVmSimple, (*AK4JetPt_singleLepCalc));
-	indexPtSort(BJetAK4CISVlIndicies, nBJetAK4CISVl, (*AK4JetPt_singleLepCalc));
-
-	float leadBjetDR = -1;
-	if(nBJetAK4CISVm >=2){
-	    TLorentzVector vJ1, vJ2;
-	    int ijet = BJetAK4CISVmIndicies[0];
-	    vJ1.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
-	    ijet = BJetAK4CISVmIndicies[1];
-	    vJ2.SetPtEtaPhiE((*AK4JetPt_singleLepCalc)[ijet],(*AK4JetEta_singleLepCalc)[ijet], (*AK4JetPhi_singleLepCalc)[ijet], (*AK4JetEnergy_singleLepCalc)[ijet]);
-	    leadBjetDR = dR(vJ1,vJ2);
-	}//end calculate leadjetDR
-
-	/*	float Bl_over_HT= BTl/HT;//(0,1)
-		float Bm_over_HT= BTm/HT;//(0,1)
-		float LepT_over_HT= LepT/HT;
-		float HT_over_ST= HT/ST;//(0,1)
-		float LepT_over_ST= LepT/ST;//(0,1)
-		float MET_over_ST= corr_met_singleLepCalc/ST; //(0,1)
-		float MSum_over_ST= MSum/ST;*/
-
+                                                          
+                                                          
 	if(printlevel >= 5) cout<<"Ready for Physics"<<endl;
 
 	//                   __    __        __          __    __        __          __    __
@@ -1533,6 +1739,11 @@ if(printlevel > 5) cout << "E" << std::endl;
 		    if(KinVarSwitches->get_throwable("leadBjetDR",3)) MapKinVar.get_throwable("leadBjetDR",4)->Fill(leadBjetDR ,weight);
 		    if(KinVarSwitches->get_throwable("lepJetDR",3)) MapKinVar.get_throwable("lepJetDR",4)->Fill(lepJetDR ,weight);
 
+		    if(KinVarSwitches->get_throwable("jetLooseNotTightMuonDR",3)) for(unsigned int i=0;i<jetLooseNotTightMuonDR.size();i++) MapKinVar.get_throwable("jetLooseNotTightMuonDR",4)->Fill(jetLooseNotTightMuonDR[i] ,weight);
+		    if(KinVarSwitches->get_throwable("TightEleLooseNotTightMuonDR",3)) for(unsigned int i=0;i<TightEleLooseNotTightMuonDR.size();i++) MapKinVar.get_throwable("TightEleLooseNotTightMuonDR",4)->Fill(TightEleLooseNotTightMuonDR[i] ,weight);
+		    if(KinVarSwitches->get_throwable("LooseMuonLooseNotTightEleDR",3)) for(unsigned int i=0;i<LooseMuonLooseNotTightEleDR.size();i++) MapKinVar.get_throwable("LooseMuonLooseNotTightEleDR",4)->Fill(LooseMuonLooseNotTightEleDR[i] ,weight);
+		    if(KinVarSwitches->get_throwable("jetLooseNotTightEleDR",3)) for(unsigned int i=0;i<jetLooseNotTightEleDR.size();i++) MapKinVar.get_throwable("jetLooseNotTightEleDR",4)->Fill(jetLooseNotTightEleDR[i] ,weight);
+
 
 		}//end if event passes topo
 	    }//end try
@@ -1655,7 +1866,14 @@ if(printlevel > 5) cout << "F" << std::endl;
 				if(KinVarSwitches->get_throwable("leadjetDR",3)) FillBkg(MapKinVar.get_throwable("leadjetDR",4),leadjetDR , bkgweights, weight);
 				if(KinVarSwitches->get_throwable("leadBjetDR",3)) FillBkg(MapKinVar.get_throwable("leadBjetDR",4),leadBjetDR , bkgweights, weight);
 				if(KinVarSwitches->get_throwable("lepJetDR",3)) FillBkg(MapKinVar.get_throwable("lepJetDR",4),lepJetDR , bkgweights, weight);
-	if(printlevel > 5) cout << "G" << std::endl;
+
+				if(KinVarSwitches->get_throwable("jetLooseNotTightMuonDR",3)) for(unsigned int i=0;i<jetLooseNotTightMuonDR.size();i++) FillBkg(MapKinVar.get_throwable("jetLooseNotTightMuonDR",4), jetLooseNotTightMuonDR[i], bkgweights, weight);
+				if(KinVarSwitches->get_throwable("TightEleLooseNotTightMuonDR",3)) for(unsigned int i=0;i<TightEleLooseNotTightMuonDR.size();i++) FillBkg(MapKinVar.get_throwable("TightEleLooseNotTightMuonDR",4), TightEleLooseNotTightMuonDR[i], bkgweights, weight);
+				if(KinVarSwitches->get_throwable("LooseMuonLooseNotTightEleDR",3)) for(unsigned int i=0;i<LooseMuonLooseNotTightEleDR.size();i++) FillBkg(MapKinVar.get_throwable("LooseMuonLooseNotTightEleDR",4), LooseMuonLooseNotTightEleDR[i], bkgweights, weight);
+				if(KinVarSwitches->get_throwable("jetLooseNotTightEleDR",3)) for(unsigned int i=0;i<jetLooseNotTightEleDR.size();i++) FillBkg(MapKinVar.get_throwable("jetLooseNotTightEleDR",4), jetLooseNotTightEleDR[i], bkgweights, weight);
+			
+			
+				if(printlevel > 5) cout << "G" << std::endl;
 
 				}//end if event passes topo
 			}//end try
